@@ -1,0 +1,31 @@
+# OneAgent NVBit Extension
+
+## Foreword
+
+Created by [Tomasz Gajger](https://github.com/tomix86).
+
+**Notice**: although the author is a Dynatrace employee, this is a private project. It is not maintained nor endorsed by the Dynatrace.
+
+The project is released under the [MIT License](LICENSE).
+
+## Overview
+
+A [Dynatrace OneAgent](https://www.dynatrace.com/support/help/) extension for gathering NVIDIA GPU metrics using [NVBit](https://github.com/NVlabs/NVBit).
+
+### Requirements
+
+* OneAgent version >= 1.175.
+* For plugin development: [OneAgent Plugin SDK v1.175 or newer](https://dynatrace.github.io/plugin-sdk/index.html).
+* Python >= 3.6.
+
+## Configuration
+
+...
+
+## Reported metrics
+
+...
+
+## Alerting
+
+...
