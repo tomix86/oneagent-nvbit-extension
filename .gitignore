@@ -4,3 +4,5 @@
 *.ptx
 *.cubin
 *.fatbin
+docs/nvbit_release
+docs/*.tar.bz2
