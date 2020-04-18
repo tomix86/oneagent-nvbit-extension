@@ -1,3 +1,5 @@
+#include "Configuration.h"
+
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 #include <string_view>
@@ -14,8 +16,8 @@ static void logError(Ts... parts) {
     write(STDERR_FILENO, "\n", 1);
 }
 
-void initLogger() try {
-	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("nvbit-module.log", true);
+static void initLogger() try {
+	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(config::get().logFile, true);
 	file_sink->set_level(spdlog::level::trace);
 
 	const auto logger{ std::make_shared<spdlog::logger>("log", file_sink) };
@@ -25,6 +27,10 @@ void initLogger() try {
 
 	spdlog::info("Logger initialized");
 	spdlog::debug("Current working directory: \"{}\", pid {}", std::filesystem::current_path().string(), getpid());
+    spdlog::debug("Module configuration:");
+    config::get().print([](auto line){
+        spdlog::debug("\t{}", line);
+    });
 } catch (const spdlog::spdlog_ex& ex) {
     logError("Logger initialization failed: ", ex.what());
 }

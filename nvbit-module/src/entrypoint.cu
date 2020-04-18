@@ -31,13 +31,8 @@
 #include <stdio.h>
 #include <unordered_set>
 
-/* every tool needs to include this once */
 #include "nvbit_tool.h"
-
-/* nvbit interface file */
 #include "nvbit.h"
-
-/* nvbit utility functions */
 #include "utils/utils.h"
 
 /* kernel id counter, maintained in system memory */
@@ -68,9 +63,6 @@ bool active_region = true;
  * therefore to "corrupt" the counter variable */
 pthread_mutex_t mutex;
 
-/* nvbit_at_init() is executed as soon as the nvbit tool is loaded. We typically
- * do initializations in this call. In this case for instance we get some
- * environment variables values which we use as input arguments to the tool */
 void nvbit_at_init() {
     /* just make sure all managed variables are allocated on GPU */
     setenv("CUDA_MANAGED_FORCE_DEVICE_ALLOC", "1", 1);

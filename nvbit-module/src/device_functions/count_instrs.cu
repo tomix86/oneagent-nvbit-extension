@@ -25,9 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdint.h>
-#include <stdio.h>
-
+#include <cstdint>
 #include "utils/utils.h"
 
 extern "C" __device__ __noinline__ void count_instrs(int predicate,
