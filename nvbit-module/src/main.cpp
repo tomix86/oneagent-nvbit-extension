@@ -17,7 +17,7 @@ static void logError(Ts... parts) {
 }
 
 static void initLogger() try {
-	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(config::get().logFile, true);
+	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(config::get().logFile);
 	file_sink->set_level(spdlog::level::trace);
 
 	const auto logger{ std::make_shared<spdlog::logger>("log", file_sink) };
@@ -36,6 +36,7 @@ static void initLogger() try {
 }
  
 void __attribute__((constructor)) initialize() try {
+    config::initialize();
     initLogger();
 } catch (const std::exception& ex) {
     logError("Error in constructor: ", ex.what());

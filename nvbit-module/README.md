@@ -8,7 +8,7 @@
 
 * [spdlog](https://github.com/gabime/spdlog) (tested with v1.3.1)
 * [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) (tested with v10.2)
-* [Boost](https://www.boost.org/) (tested with v1.70.0)
+* [Boost](https://www.boost.org/) (tested with v1.71.0)
 * [CMake](https://cmake.org/download/) (tested with v3.15.5)
 * [vcpkg](https://github.com/Microsoft/vcpkg)
 
