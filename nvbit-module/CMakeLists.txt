@@ -19,6 +19,7 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --gpu-architecture=sm_35 -D_FORCE_INLI
 
 add_library(entrypoint OBJECT ${ENTRYPOINT_SOURCE})
 target_compile_options(entrypoint PRIVATE -O3 --relocatable-device-code=true --ptxas-options=-cloning=no)
+target_link_libraries(entrypoint PRIVATE spdlog::spdlog)
 
 add_library(injected_functions OBJECT ${DEVICE_SOURCES})
 target_compile_options(injected_functions PRIVATE --maxrregcount=24 --keep-device-functions --ptxas-options=--compile-as-tools-patch)

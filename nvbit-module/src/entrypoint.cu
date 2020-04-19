@@ -28,12 +28,13 @@
 #include <assert.h>
 #include <pthread.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <unordered_set>
 
 #include "nvbit_tool.h"
 #include "nvbit.h"
 #include "utils/utils.h"
+#include "Configuration.h"
+#include "Logger.h"
 
 /* kernel id counter, maintained in system memory */
 uint32_t kernel_id = 0;
@@ -45,17 +46,6 @@ uint64_t tot_app_instrs = 0;
 /* kernel instruction counter, updated by the GPU */
 __managed__ uint64_t counter = 0;
 
-/* global control variables for this tool */
-uint32_t instr_begin_interval = 0;
-uint32_t instr_end_interval = UINT32_MAX;
-uint32_t start_grid_num = 0;
-uint32_t end_grid_num = UINT32_MAX;
-int verbose = 0;
-int count_warp_level = 1;
-int exclude_pred_off = 0;
-int active_from_start = 1;
-bool mangled = false;
-
 /* used to select region of insterest when active from start is off */
 bool active_region = true;
 
@@ -64,42 +54,14 @@ bool active_region = true;
 pthread_mutex_t mutex;
 
 void nvbit_at_init() {
-    /* just make sure all managed variables are allocated on GPU */
+    logging::info("NVBit runtime initializing");
+
+    // Make sure all managed variables are allocated on GPU
     setenv("CUDA_MANAGED_FORCE_DEVICE_ALLOC", "1", 1);
 
-    /* we get some environment variables that are going to be use to selectively
-     * instrument (within a interval of kernel indexes and instructions). By
-     * default we instrument everything. */
-    GET_VAR_INT(
-        instr_begin_interval, "INSTR_BEGIN", 0,
-        "Beginning of the instruction interval where to apply instrumentation");
-    GET_VAR_INT(
-        instr_end_interval, "INSTR_END", UINT32_MAX,
-        "End of the instruction interval where to apply instrumentation");
-    GET_VAR_INT(start_grid_num, "START_GRID_NUM", 0,
-                "Beginning of the kernel gird launch interval where to apply "
-                "instrumentation");
-    GET_VAR_INT(
-        end_grid_num, "END_GRID_NUM", UINT32_MAX,
-        "End of the kernel launch interval where to apply instrumentation");
-    GET_VAR_INT(count_warp_level, "COUNT_WARP_LEVEL", 1,
-                "Count warp level or thread level instructions");
-    GET_VAR_INT(exclude_pred_off, "EXCLUDE_PRED_OFF", 0,
-                "Exclude predicated off instruction from count");
-    GET_VAR_INT(
-        active_from_start, "ACTIVE_FROM_START", 1,
-        "Start instruction counting from start or wait for cuProfilerStart "
-        "and cuProfilerStop");
-    GET_VAR_INT(mangled, "MANGLED_NAMES", 1,
-                "Print kernel names mangled or not");
-
-    GET_VAR_INT(verbose, "TOOL_VERBOSE", 0, "Enable verbosity inside the tool");
-    if (active_from_start == 0) {
+    if (!config::get().active_from_start) {
         active_region = false;
     }
-
-    std::string pad(100, '-');
-    printf("%s\n", pad.c_str());
 }
 
 /* Set used to avoid re-instrumenting the same functions multiple times */
@@ -127,28 +89,26 @@ void instrument_function_if_needed(CUcontext ctx, CUfunction func) {
 
         /* If verbose we print function name and number of" static" instructions
          */
-        if (verbose) {
-            printf("inspecting %s - num instrs %ld\n",
-                   nvbit_get_func_name(ctx, f), instrs.size());
+        if (config::get().verbose) {
+            logging::debug("inspecting {} - num instrs {}\n", nvbit_get_func_name(ctx, f), instrs.size());
         }
 
         /* We iterate on the vector of instruction */
         for (auto i : instrs) {
             /* Check if the instruction falls in the interval where we want to
              * instrument */
-            if (i->getIdx() >= instr_begin_interval &&
-                i->getIdx() < instr_end_interval) {
+            if (i->getIdx() >= config::get().instr_begin_interval &&
+                i->getIdx() < config::get().instr_end_interval) {
                 /* If verbose we print which instruction we are instrumenting
                  * (both offset in the function and SASS string) */
-                if (verbose == 1) {
+                if (config::get().verbose) {
                     i->print();
-                } else if (verbose == 2) {
                     i->printDecoded();
                 }
 
                 /* Insert a call to "count_instrs" before the instruction "i" */
                 nvbit_insert_call(i, "count_instrs", IPOINT_BEFORE);
-                if (exclude_pred_off) {
+                if (config::get().exclude_pred_off) {
                     /* pass predicate value */
                     nvbit_add_call_arg_pred_val(i);
                 } else {
@@ -157,7 +117,7 @@ void instrument_function_if_needed(CUcontext ctx, CUfunction func) {
                 }
 
                 /* add count warps option */
-                nvbit_add_call_arg_const_val32(i, count_warp_level);
+                nvbit_add_call_arg_const_val32(i, config::get().count_warp_level ? 1 : 0);
                 /* add pointer to counter location */
                 nvbit_add_call_arg_const_val64(i, (uint64_t)&counter);
             }
@@ -193,8 +153,8 @@ void nvbit_at_cuda_event(CUcontext ctx, int is_exit, nvbit_api_cuda_t cbid,
             pthread_mutex_lock(&mutex);
             instrument_function_if_needed(ctx, p->f);
 
-            if (active_from_start) {
-                if (kernel_id >= start_grid_num && kernel_id < end_grid_num) {
+            if (config::get().active_from_start) {
+                if (kernel_id >= config::get().start_grid_num && kernel_id < config::get().end_grid_num) {
                     active_region = true;
                 } else {
                     active_region = false;
@@ -223,24 +183,21 @@ void nvbit_at_cuda_event(CUcontext ctx, int is_exit, nvbit_api_cuda_t cbid,
                 cuLaunchKernel_params *p2 = (cuLaunchKernel_params *)params;
                 num_ctas = p2->gridDimX * p2->gridDimY * p2->gridDimZ;
             }
-            printf(
-                "\nkernel %d - %s - #thread-blocks %d,  kernel "
-                "instructions %ld, total instructions %ld\n",
-                kernel_id++, nvbit_get_func_name(ctx, p->f, mangled), num_ctas,
-                counter, tot_app_instrs);
+            logging::info("kernel {} - {} - #thread-blocks {},  kernel instructions {}, total instructions {}", kernel_id++, nvbit_get_func_name(ctx, p->f, config::get().mangled ? 1 : 0), num_ctas, counter, tot_app_instrs);
             pthread_mutex_unlock(&mutex);
         }
     } else if (cbid == API_CUDA_cuProfilerStart && is_exit) {
-        if (!active_from_start) {
+        if (!config::get().active_from_start) {
             active_region = true;
         }
     } else if (cbid == API_CUDA_cuProfilerStop && is_exit) {
-        if (!active_from_start) {
+        if (!config::get().active_from_start) {
             active_region = false;
         }
     }
 }
 
 void nvbit_at_term() {
-    printf("Total app instructions: %ld\n", tot_app_instrs);
+    logging::info("NVBit runtime exiting");
+    logging::info("Total app instructions: {}\n", tot_app_instrs);
 }
