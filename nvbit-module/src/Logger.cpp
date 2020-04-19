@@ -9,6 +9,11 @@ using namespace std::string_literals;
 
 namespace logging {
 
+void default_initialize() try {
+    spdlog::default_logger()->set_level(spdlog::level::off);
+} catch (...){
+}
+
 void initialize(const std::string& logFilePath) try {
 	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFilePath);
 	file_sink->set_level(spdlog::level::trace);

@@ -18,7 +18,9 @@ void writeStderr(Ts... parts) {
 void __attribute__((constructor)) initialize() try {
     // Disable NVBit banner printing
     setenv("NOBANNER", "1", 1);
-    
+
+    logging::default_initialize();
+
     config::initialize();
     logging::initialize(config::get().logFile);
     

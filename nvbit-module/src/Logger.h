@@ -4,6 +4,8 @@
 #include <string>
 
 namespace logging {
+void default_initialize();
+
 void initialize(const std::string& logFilePath);
 
 template <typename... Ts>
