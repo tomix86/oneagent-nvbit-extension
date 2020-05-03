@@ -12,8 +12,11 @@ def shutdown():
 
 def enumDevices():
     deviceCount = nvmlDeviceGetCount()
+    devices = []
     for i in range(deviceCount):
         handle = nvmlDeviceGetHandleByIndex(i)
 
         deviceName = nvmlDeviceGetName(handle).decode('UTF-8')
-        print(f"Device {i}: {deviceName}")
+        devices.append(f"Device {i}: {deviceName}")
+
+    return devices

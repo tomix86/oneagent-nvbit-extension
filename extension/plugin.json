@@ -1,0 +1,93 @@
+{
+  "version": "1.0.13",
+  "name": "custom.python.nvbit_extension",
+  "type": "python",
+  "requiredAgentVersion": "1.191",
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "metricGroup": "gpu.cuda",
+  "processTypeNames": [
+    "UNKNOWN",
+    "LINUX_SYSTEM",
+    "WINDOWS_SYSTEM",
+    "JAVA",
+    "DOTNET",
+    "RUBY",
+    "PERL",
+    "NODE_JS",
+    "PYTHON",
+    "GO"
+  ],
+  "source": {
+    "package": "nvbit_extension",
+    "className": "NVBitExtension",
+    "install_requires": [
+      "nvidia-ml-py3>=7.352.0"
+    ],
+    "activation": "Singleton"
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "gpu_occupancy",
+        "unit": "Percent",
+        "aggregation": "count",
+        "displayname": "GPU memory used by the process"
+      }
+    }
+  ],
+  "ui": {
+    "keymetrics": [
+      {
+        "key": "gpu_occupancy",
+        "displayname": "GPU Occupancy",
+        "aggregation": "avg",
+        "mergeaggregation": "avg"
+      }
+    ],
+    "keycharts": [
+      {
+        "group": "GPU Metrics",
+        "title": "Occupancy",
+        "series": [
+          {
+            "key": "gpu_occupancy",
+            "aggregation": "avg",
+            "displayname": "Total",
+            "seriestype": "line"
+          }
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "group": "GPU Metrics",
+        "title": "Occupancy",
+        "series": [
+          {
+            "key": "gpu_occupancy",
+            "aggregation": "avg",
+            "displayname": "Total",
+            "seriestype": "line"
+          }
+        ]
+      }
+    ]
+  },
+  "configUI": {
+    "displayName": "OneAgent NVBit Extension",
+    "properties": [
+      {
+        "key": "enable_debug_log",
+        "displayName": "Enable debug logging",
+        "displayOrder": 1
+      }
+    ]
+  },
+  "properties": [
+    {
+      "key": "enable_debug_log",
+      "type": "boolean",
+      "defaultValue": false
+    }
+  ]
+}
