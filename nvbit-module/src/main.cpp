@@ -24,9 +24,9 @@ void __attribute__((constructor)) initialize() try {
     config::initialize();
     logging::initialize(config::get().logFile);
     
-    logging::debug("NVBit module loaded, configuration:");
+    logging::info("NVBit module loaded, configuration:");
     config::get().print([](auto line){
-        logging::debug("\t{}", line);
+        logging::info("\t{}", line);
     });
 } catch (const std::exception& ex) {
     writeStderr("Error in constructor: ", ex.what());

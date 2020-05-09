@@ -9,6 +9,16 @@ void default_initialize();
 void initialize(const std::string& logFilePath);
 
 template <typename... Ts>
+void error(Ts... args) {
+    spdlog::error(args...);
+}
+
+template <typename... Ts>
+void warning(Ts... args) {
+    spdlog::warn(args...);
+}
+
+template <typename... Ts>
 void info(Ts... args) {
     spdlog::info(args...);
 }

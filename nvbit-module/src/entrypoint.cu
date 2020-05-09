@@ -30,6 +30,7 @@
 #include "Configuration.h"
 #include "Logger.h"
 #include "device_functions/functions_registry.h"
+#include "RuntimeConfigurationPoller.h"
 
 #include <pthread.h>
 #include <cstdint>
@@ -39,6 +40,8 @@
 __managed__ uint64_t counter = 0; // kernel instruction counter, updated by the GPU
 uint64_t tot_app_instrs = 0; // total instruction counter, maintained in system memory, incremented by "counter" every time a kernel completes
 bool active_region = true; // used to select region of insterest when active from start is off
+
+config::RuntimeConfigurationPoller runtimeConfigPoller;
 
 #define checkCudaErrors(val) checkError((val), #val, __FILE__, __LINE__)
 void checkError(cudaError_t result, const char* calledFunc, std::string file, int line) {
@@ -53,7 +56,7 @@ bool is_in_range(const T& val, const T& low, const T& high) {
     return val >= low && val < high;
 }
 
-static void instrumentFunctionIfNeeded(CUcontext context, CUfunction func) {
+static void instrumentFunctionIfNeeded(CUcontext context, CUfunction func, const std::string& instrumentationFunction) {
     static std::unordered_set<CUfunction> already_instrumented;
 
     auto relatedFunctions = nvbit_get_related_functions(context, func); // Get related functions of the kernel (device function that can be called by the kernel)
@@ -81,7 +84,7 @@ static void instrumentFunctionIfNeeded(CUcontext context, CUfunction func) {
                 instruction->printDecoded();
             }
 
-            nvbit_insert_call(instruction, NAME_OF(INSTRUMENTATION__INSTRUCTIONS_COUNT), IPOINT_BEFORE); // Insert a call to instrumentation routine before the instruction
+            nvbit_insert_call(instruction, instrumentationFunction.c_str(), IPOINT_BEFORE); // Insert a call to instrumentation routine before the instruction
             if (config::get().exclude_pred_off) {
                 nvbit_add_call_arg_pred_val(instruction); // pass predicate value
             } else {
@@ -106,13 +109,17 @@ if we are exiting a kernel launch:
     3. Print the thread instruction counters
     4. Release the lock
 */
-static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params) {
+static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params, const std::string& instrumentationFunction) {
     static uint32_t kernel_id = 0; // kernel id counter, maintained in system memory
     static pthread_mutex_t mutex; // used to prevent multiple kernels to run concurrently and therefore to "corrupt" the counter variable
 
+    const auto kernelName = nvbit_get_func_name(context, params->f, config::get().mangled ? 1 : 0);
+
     if (!is_exit) {
+        logging::info("Instrumenting kernel {} with {} function", kernelName, instrumentationFunction);
+
         pthread_mutex_lock(&mutex);
-        instrumentFunctionIfNeeded(context, params->f);
+        instrumentFunctionIfNeeded(context, params->f, instrumentationFunction);
 
         if (config::get().active_from_start) {
             active_region = is_in_range(kernel_id, config::get().start_grid_num, config::get().end_grid_num);
@@ -130,7 +137,7 @@ static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cud
             num_ctas = kernelLaunchParams->gridDimX * kernelLaunchParams->gridDimY * kernelLaunchParams->gridDimZ;
         }
 
-        logging::info("kernel {} - {} - #thread-blocks {},  kernel instructions {}, total instructions {}", kernel_id++, nvbit_get_func_name(context, params->f, config::get().mangled ? 1 : 0), num_ctas, counter, tot_app_instrs);
+        logging::info("kernel {} - {} - #thread-blocks {},  kernel instructions {}, total instructions {}", kernel_id++, kernelName, num_ctas, counter, tot_app_instrs);
         pthread_mutex_unlock(&mutex);
     }
 }
@@ -144,12 +151,17 @@ void nvbit_at_init() {
     if (!config::get().active_from_start) {
         active_region = false;
     }
+
+    runtimeConfigPoller.initialize(config::get().runtime_config_path, std::chrono::seconds{config::get().runtime_config_polling_interval});
 }
 
 void nvbit_at_cuda_event(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, const char* /* name */, void* params, CUresult* /* pStatus */) {
     const auto launchEvents = {API_CUDA_cuLaunch, API_CUDA_cuLaunchKernel_ptsz, API_CUDA_cuLaunchGrid, API_CUDA_cuLaunchGridAsync, API_CUDA_cuLaunchKernel};
     if (boost::algorithm::any_of_equal(launchEvents, eventId)) {
-        instrumentKernelLaunch(context, is_exit, eventId, static_cast<cuLaunch_params*>(params));
+        const auto instrumentationFunctions = runtimeConfigPoller.getConfig().getInstrumentationFunctions();
+        if(!instrumentationFunctions.empty()) {
+            instrumentKernelLaunch(context, is_exit, eventId, static_cast<cuLaunch_params*>(params), instrumentationFunctions.front());
+        }
     } else if (eventId == API_CUDA_cuProfilerStart && is_exit) {
         if (!config::get().active_from_start) {
             active_region = true;
@@ -163,5 +175,5 @@ void nvbit_at_cuda_event(CUcontext context, int is_exit, nvbit_api_cuda_t eventI
 
 void nvbit_at_term() {
     logging::info("NVBit runtime exiting");
-    logging::info("Total app instructions: {}\n", tot_app_instrs);
+    logging::info("Total app instructions: {}", tot_app_instrs);
 }
