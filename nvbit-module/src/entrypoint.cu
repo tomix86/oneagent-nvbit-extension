@@ -30,7 +30,7 @@
 #include "Configuration.h"
 #include "Logger.h"
 #include "device_functions/functions_registry.h"
-#include "RuntimeConfigurationPoller.h"
+#include "communication/RuntimeConfigurationPoller.h"
 
 #include <pthread.h>
 #include <cstdint>
@@ -41,7 +41,7 @@ __managed__ uint64_t counter = 0; // kernel instruction counter, updated by the 
 uint64_t tot_app_instrs = 0; // total instruction counter, maintained in system memory, incremented by "counter" every time a kernel completes
 bool active_region = true; // used to select region of insterest when active from start is off
 
-config::RuntimeConfigurationPoller runtimeConfigPoller;
+communication::RuntimeConfigurationPoller runtimeConfigPoller;
 
 #define checkCudaErrors(val) checkError((val), #val, __FILE__, __LINE__)
 void checkError(cudaError_t result, const char* calledFunc, std::string file, int line) {

@@ -1,7 +1,7 @@
 #include "RuntimeConfiguration.h"
 
-#include "device_functions/functions_registry.h"
-#include "ErrorUtil.h"
+#include "../device_functions/functions_registry.h"
+#include "../ErrorUtil.h"
 
 #include <boost/algorithm/string.hpp>
 #include <unordered_map>
@@ -16,7 +16,7 @@ const std::unordered_map<int, std::string> intrumentationFunctionIdToName {
     {0, NAME_OF(INSTRUMENTATION__INSTRUCTIONS_COUNT)}
 };
 
-namespace config {
+namespace communication {
 
 void RuntimeConfiguration::load(const std::string& filePath) {
     //TODO: reload only if file contents changed
@@ -62,4 +62,4 @@ std::vector<std::string> RuntimeConfiguration::getInstrumentationFunctions() con
     return result;
 }
 
-} // namespace config
+} // namespace communication

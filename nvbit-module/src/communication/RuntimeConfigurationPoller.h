@@ -6,7 +6,7 @@
 #include <atomic>
 #include <chrono>
 
-namespace config {
+namespace communication {
 
 class RuntimeConfigurationPoller {
 public:
@@ -22,4 +22,4 @@ private:
     std::atomic_bool active{false};
 };
 
-} // namespace config
+} // namespace communication

@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-namespace config {
+namespace communication {
 
 class RuntimeConfiguration {
 public:
@@ -15,4 +15,4 @@ private:
     std::vector<int> instrumentationFunctions;
 };
 
-} // namespace config
+} // namespace communication

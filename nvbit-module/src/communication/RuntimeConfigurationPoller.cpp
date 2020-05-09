@@ -1,7 +1,7 @@
 #include "RuntimeConfigurationPoller.h"
 
 #include "RuntimeConfiguration.h"
-#include "Logger.h"
+#include "../Logger.h"
 
 #include <boost/algorithm/string/join.hpp>
 
@@ -9,7 +9,7 @@ using namespace std::chrono_literals;
 
 using myclock = std::chrono::steady_clock;
 
-namespace config {
+namespace communication {
 
 void RuntimeConfigurationPoller::initialize(std::string filePath, std::chrono::seconds pollingInterval) {
     logging::info("Runtime configuration will be polled from {} every {}s", filePath, pollingInterval.count());
@@ -58,4 +58,4 @@ const RuntimeConfiguration& RuntimeConfigurationPoller::getConfig() {
     return config;
 }
 
-} // namespace config
+} // namespace communication
