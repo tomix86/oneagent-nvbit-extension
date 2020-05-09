@@ -20,8 +20,9 @@ struct Configuration {
     bool exclude_pred_off{false};
     bool active_from_start{true};
     bool mangled{true};
-    std::string runtime_config_path{""};
+    std::string runtime_config_path;
     uint32_t runtime_config_polling_interval{10}; //TODO: make this std::chrono::seconds
+    std::string measurements_output_dir;
 
     void print(std::function<void(std::string line)> linePrinter) const;
 };

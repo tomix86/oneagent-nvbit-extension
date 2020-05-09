@@ -1,20 +1,15 @@
 #include "RuntimeConfiguration.h"
 
-#include "../device_functions/functions_registry.h"
 #include "../ErrorUtil.h"
+#include "FunctionToIdMapping.h"
 
 #include <boost/algorithm/string.hpp>
-#include <unordered_map>
 #include <fstream>
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdexcept>
 
 using namespace std::string_literals;
-
-const std::unordered_map<int, std::string> intrumentationFunctionIdToName {
-    {0, NAME_OF(INSTRUMENTATION__INSTRUCTIONS_COUNT)}
-};
 
 namespace communication {
 
@@ -53,9 +48,8 @@ void RuntimeConfiguration::load(const std::string& filePath) {
 std::vector<std::string> RuntimeConfiguration::getInstrumentationFunctions() const {
     std::vector<std::string> result;
     for(auto functionId : instrumentationFunctions) {
-        const auto name{intrumentationFunctionIdToName.find(functionId)};
-        if(name != intrumentationFunctionIdToName.end()) {
-            result.push_back(name->second);
+        if(isIdValid(functionId)) {
+            result.push_back(nameFromId(functionId));
         }
     }
 

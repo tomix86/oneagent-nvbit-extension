@@ -31,6 +31,7 @@
 #include "Logger.h"
 #include "device_functions/functions_registry.h"
 #include "communication/RuntimeConfigurationPoller.h"
+#include "communication/MeasurementsPublisher.h"
 
 #include <pthread.h>
 #include <cstdint>
@@ -42,6 +43,7 @@ uint64_t tot_app_instrs = 0; // total instruction counter, maintained in system 
 bool active_region = true; // used to select region of insterest when active from start is off
 
 communication::RuntimeConfigurationPoller runtimeConfigPoller;
+communication::MeasurementsPublisher measurementsPublisher;
 
 #define checkCudaErrors(val) checkError((val), #val, __FILE__, __LINE__)
 void checkError(cudaError_t result, const char* calledFunc, std::string file, int line) {
@@ -138,6 +140,7 @@ static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cud
         }
 
         logging::info("kernel {} - {} - #thread-blocks {},  kernel instructions {}, total instructions {}", kernel_id++, kernelName, num_ctas, counter, tot_app_instrs);
+        measurementsPublisher.publish(instrumentationFunction, std::to_string(counter));
         pthread_mutex_unlock(&mutex);
     }
 }
@@ -153,6 +156,7 @@ void nvbit_at_init() {
     }
 
     runtimeConfigPoller.initialize(config::get().runtime_config_path, std::chrono::seconds{config::get().runtime_config_polling_interval});
+    measurementsPublisher.initialize(config::get().measurements_output_dir);
 }
 
 void nvbit_at_cuda_event(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, const char* /* name */, void* params, CUresult* /* pStatus */) {

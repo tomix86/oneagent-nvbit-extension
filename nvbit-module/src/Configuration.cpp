@@ -38,6 +38,7 @@ void Configuration::print(std::function<void(std::string line)> linePrinter) con
     linePrinter("mangled: " + to_string(mangled));
     linePrinter("runtime config path: " + runtime_config_path);
     linePrinter("runtime config polling interval: " + std::to_string(runtime_config_polling_interval) + "s");
+    linePrinter("measurements output directory: " + measurements_output_dir);
 }
 
 static std::optional<std::string> getEnvVar(std::string name) {
@@ -63,6 +64,7 @@ static void parseConfigFile(Configuration& config, std::ifstream& file) {
         ("mangled_names", po::value<bool>(&config.mangled), "Print kernel names mangled or not")
         ("runtime_config_path", po::value<std::string>(&config.runtime_config_path), "Path to runtime configuration file")
         ("runtime_config_polling_interval", po::value<uint32_t>(&config.runtime_config_polling_interval), "Runtime configuration file polling interval")
+        ("measurements_output_dir", po::value<std::string>(&config.measurements_output_dir), "Path to results output directory")
     ;
 
     po::variables_map vm;

@@ -7,7 +7,7 @@
 
 using namespace std::chrono_literals;
 
-using myclock = std::chrono::steady_clock;
+using std::chrono::steady_clock;
 
 namespace communication {
 
@@ -15,10 +15,10 @@ void RuntimeConfigurationPoller::initialize(std::string filePath, std::chrono::s
     logging::info("Runtime configuration will be polled from {} every {}s", filePath, pollingInterval.count());
 
     pollerThread = std::thread([this, filePath = std::move(filePath), pollingInterval](){
-        auto begin{myclock::now()};
+        auto begin{steady_clock::now()};
         
         while(active) {
-            const auto now{myclock::now()};
+            const auto now{steady_clock::now()};
             if(now - begin > pollingInterval) {
                 begin = now;
 
