@@ -2,29 +2,27 @@ from pathlib import Path
 from typing import NamedTuple, List
 from os import fsync, rename
 
-class InstrumentationFunctions:
-    INSTRUCTIONS_COUNT: int = 0
-
+from .metric_to_id_mapping import InstrumentationFunction
 
 class ModuleConfiguration(NamedTuple):
     pids_to_instrument: List[int]
-    instrumentation_functions: List[int] = [ InstrumentationFunctions.INSTRUCTIONS_COUNT ]
+    instrumentation_functions: List[int] = [ InstrumentationFunction.INSTRUCTIONS_COUNT ]
 
 class ModuleConfigurationWriter:
-    confFilePath: Path = "/var/lib/dynatrace/oneagent/agent/runtime/nvbit-module-runtime.conf"
-    instrumentation_enabled: bool = False
+    __confFilePath: Path = "/var/lib/dynatrace/oneagent/agent/runtime/nvbit-module-runtime.conf"
+    __instrumentation_enabled: bool = False
 
     def __init__(self, instrumentation_enabled: bool):
-        self.instrumentation_enabled = instrumentation_enabled
+        self.__instrumentation_enabled = instrumentation_enabled
     
-    def write(self, config: ModuleConfiguration):
+    def write(self, config: ModuleConfiguration) -> None:
         #TODO: add a helper for atomic write
-        tmpFilePath = self.confFilePath + ".tmp"
+        tmpFilePath = self.__confFilePath + ".tmp"
         with open(tmpFilePath, mode="w") as confFile:
-            if self.instrumentation_enabled:                
+            if self.__instrumentation_enabled:                
                 for pid in config.pids_to_instrument:
                     instrument_with = ','.join(str(id) for id in config.instrumentation_functions)
                     confFile.write(f"{pid}:{instrument_with}\n")
             confFile.flush()
             fsync(confFile.fileno())
-        rename(tmpFilePath, self.confFilePath)
+        rename(tmpFilePath, self.__confFilePath)
