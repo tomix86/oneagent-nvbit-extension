@@ -14,8 +14,8 @@ A [Dynatrace OneAgent](https://www.dynatrace.com/support/help/) extension for ga
 
 ### Requirements
 
-* OneAgent version >= 1.175.
-* For plugin development: [OneAgent Plugin SDK v1.175 or newer](https://dynatrace.github.io/plugin-sdk/index.html).
+* OneAgent version >= 1.191.
+* For plugin development: [OneAgent Plugin SDK v1.191 or newer](https://dynatrace.github.io/plugin-sdk/index.html).
 * Python >= 3.6.
 * [Compiled native module](nvbit-module/README.md).
 

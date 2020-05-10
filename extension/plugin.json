@@ -1,5 +1,5 @@
 {
-  "version": "1.0.13",
+  "version": "1.0.21",
   "name": "custom.python.nvbit_extension",
   "type": "python",
   "requiredAgentVersion": "1.191",
@@ -20,9 +20,7 @@
   "source": {
     "package": "nvbit_extension",
     "className": "NVBitExtension",
-    "install_requires": [
-      "nvidia-ml-py3>=7.352.0"
-    ],
+    "install_requires": [],
     "activation": "Singleton"
   },
   "metrics": [
@@ -32,6 +30,14 @@
         "unit": "Percent",
         "aggregation": "count",
         "displayname": "GPU memory used by the process"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "instructions_per_second",
+        "unit": "PerSecond",
+        "aggregation": "count",
+        "displayname": "GPU instructions executed per second"
       }
     }
   ],
@@ -70,6 +76,18 @@
             "seriestype": "line"
           }
         ]
+      },
+      {
+        "group": "GPU Metrics",
+        "title": "Instructions executed",
+        "series": [
+          {
+            "key": "instructions_per_second",
+            "aggregation": "avg",
+            "displayname": "Instructions executed",
+            "seriestype": "bar"
+          }
+        ]
       }
     ]
   },
@@ -80,6 +98,17 @@
         "key": "enable_debug_log",
         "displayName": "Enable debug logging",
         "displayOrder": 1
+      },
+      {
+        "key": "enable_intrumentation",
+        "displayName": "Enable instrumentation",
+        "displayOrder": 2
+      },
+      {
+        "key": "monitored_pg_names",
+        "displayName": "Names of process groups that should be monitored",
+        "displayOrder": 3,
+        "displayHint": "CUDA app,blockchain_processor[,...]"
       }
     ]
   },
@@ -88,6 +117,16 @@
       "key": "enable_debug_log",
       "type": "boolean",
       "defaultValue": false
+    },
+    {
+      "key": "enable_intrumentation",
+      "type": "boolean",
+      "defaultValue": true
+    },
+    {
+      "key": "monitored_pg_names",
+      "type": "string",
+      "defaultValue": ""
     }
   ]
 }
