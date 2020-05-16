@@ -1,37 +1,65 @@
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 from os import listdir, unlink, mkdir, umask
 
 from .metric_to_id_mapping import InstrumentationFunction
 
+Metric = Tuple[int, float]
+Measurements = Dict[int, List[Metric]]
+
+
 class MeasurementsReader:
-    __measurementsPath: Path = Path("/var/lib/dynatrace/oneagent/agent/runtime/nvbit_module_measurements")
+    __measurementsPath: Path = Path(
+        "/var/lib/dynatrace/oneagent/agent/runtime/nvbit_module_measurements")
 
     @classmethod
-    def createMeasurementsDir(self) -> None:
+    def createMeasurementsDir(cls) -> None:
         try:
             umask(0o000)
-            mkdir(self.__measurementsPath, 0o1777)
+            mkdir(cls.__measurementsPath, 0o1777)
         except FileExistsError:
             pass
         finally:
             umask(0o022)
 
     @classmethod
-    def read(self) -> Dict[int, List[Tuple[int, float]]]:
+    def __addMeasurement(cls, measurements: Measurements, pid: int, entry: Metric) -> None:
+        try:
+            measurements[pid].append(entry)
+        except KeyError:
+            measurements[pid] = [entry]
+
+    @classmethod
+    def __extractPid(cls, filename: str) -> Optional[int]:
+        if filename.count("-") != 2:
+            return None
+
+        pid = filename.split("-")[0]
+        if not pid.isdigit():
+            return None
+
+        return int(pid)
+
+    @classmethod
+    def read(cls) -> Measurements:
         measurements = {}
-        for filePath in listdir(self.__measurementsPath):
-            #TODO: error checking for file name
-            pid = int(filePath.split("-")[0])
-            with open(self.__measurementsPath / filePath, mode="r") as measurementsFile:
+        for filename in listdir(cls.__measurementsPath):
+            pid = cls.__extractPid(filename)
+            if not pid:
+                continue
+
+            with open(cls.__measurementsPath / filename, mode="r") as measurementsFile:
                 for line in measurementsFile.readlines():
-                    #TODO: error checking for line syntax
-                    metricId, measurement = line.split(":")
-                    entry = (int(metricId), float(measurement))
+                    if line.count(":") != 1:
+                        continue
+
                     try:
-                        measurements[pid].append(entry)
-                    except KeyError:
-                        measurements[pid] = [entry]
-            unlink(self.__measurementsPath / filePath)
-        
+                        metricId, measurement = line.split(":")
+                        entry = (int(metricId), float(measurement))
+                        cls.__addMeasurement(measurements, pid, entry)
+                    except ValueError:
+                        continue
+
+            unlink(cls.__measurementsPath / filename)
+
         return measurements

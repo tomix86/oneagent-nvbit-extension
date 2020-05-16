@@ -6,7 +6,7 @@ from ruxit.api.selectors import ExplicitPgiSelector
 from ruxit.api.exceptions import ConfigException
 
 from communication.module_configuration_writer import ModuleConfigurationWriter, ModuleConfiguration
-from communication.measurements_reader import MeasurementsReader
+from communication.measurements_reader import MeasurementsReader, Measurements
 from communication.metric_to_id_mapping import InstrumentationFunction
 
 """
@@ -60,16 +60,19 @@ class NVBitExtension(BasePlugin):
                 self.logger.info(f"Sending '{key} = {value}' metric for '{pgi.group_name}' process group (PGIID={pgi_id:02x}, type={pgi.process_type})")
                 self.set_pgi_results(pgi_id, key, value)
 
-    def process_measurements(self, measurements: Dict[int, List[Tuple[int, float]]]) -> Dict[int, Dict[str, float]]:
+    def addMetricValue(self, metrics: Dict[int, Dict[str, float]], name: str, value: float):
+        try:
+            metrics[name] += value
+        except KeyError:
+            metrics[name] = value
+
+    def process_measurements(self, measurements: Measurements) -> Dict[int, Dict[str, float]]:
         metrics = {}
         for pid, raw_metrics in measurements.items():
             aggregated_pid_metrics = {}
             for id, value in raw_metrics:
                 name = InstrumentationFunction.get_metric_name(id)
-                try:
-                    aggregated_pid_metrics[name] += value
-                except KeyError:
-                    aggregated_pid_metrics[name] = value
+                self.addMetricValue(aggregated_pid_metrics, name, value)
             
             metrics[pid] = aggregated_pid_metrics
 
