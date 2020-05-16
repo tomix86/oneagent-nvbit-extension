@@ -3,10 +3,11 @@ from typing import NamedTuple, List
 from os import fsync, rename
 
 from .metric_to_id_mapping import InstrumentationFunction
+from util.atomic_file import atomic_write
 
 class ModuleConfiguration(NamedTuple):
     pids_to_instrument: List[int]
-    instrumentation_functions: List[int] = [ InstrumentationFunction.INSTRUCTIONS_COUNT ]
+    instrumentation_functions: List[InstrumentationFunction] = [ InstrumentationFunction.INSTRUCTIONS_COUNT ]
 
 class ModuleConfigurationWriter:
     __confFilePath: Path = "/var/lib/dynatrace/oneagent/agent/runtime/nvbit-module-runtime.conf"
@@ -16,13 +17,9 @@ class ModuleConfigurationWriter:
         self.__instrumentation_enabled = instrumentation_enabled
     
     def write(self, config: ModuleConfiguration) -> None:
-        #TODO: add a helper for atomic write
-        tmpFilePath = self.__confFilePath + ".tmp"
-        with open(tmpFilePath, mode="w") as confFile:
-            if self.__instrumentation_enabled:                
-                for pid in config.pids_to_instrument:
-                    instrument_with = ','.join(str(id) for id in config.instrumentation_functions)
-                    confFile.write(f"{pid}:{instrument_with}\n")
-            confFile.flush()
-            fsync(confFile.fileno())
-        rename(tmpFilePath, self.__confFilePath)
+        with atomic_write(self.__confFilePath) as confFile:
+            if not self.__instrumentation_enabled:
+                return
+            for pid in config.pids_to_instrument:
+                instrument_with = ','.join(str(id.value) for id in config.instrumentation_functions)
+                confFile.write(f"{pid}:{instrument_with}\n")

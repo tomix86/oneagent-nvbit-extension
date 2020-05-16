@@ -10,10 +10,12 @@ class MeasurementsReader:
     @classmethod
     def createMeasurementsDir(self) -> None:
         try:
-            umask(000)
+            umask(0o000)
             mkdir(self.__measurementsPath, 0o1777)
         except FileExistsError:
             pass
+        finally:
+            umask(0o022)
 
     @classmethod
     def read(self) -> Dict[int, List[Tuple[int, float]]]:

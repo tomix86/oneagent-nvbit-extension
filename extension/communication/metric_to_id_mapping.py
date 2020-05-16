@@ -1,11 +1,10 @@
 from enum import IntEnum
 
-#TODO: use enum here
-class InstrumentationFunction:
-    INSTRUCTIONS_COUNT: int = 0
+class InstrumentationFunction(IntEnum):
+    INSTRUCTIONS_COUNT = 0
 
     @classmethod
-    def get_metric_name(self, id: int) -> str:
-        if(id == self.INSTRUCTIONS_COUNT):
+    def get_metric_name(cls, id: int) -> str:
+        if(id == cls.INSTRUCTIONS_COUNT):
             return "instructions_per_second"
-        raise "Unknown metric identifier"
+        raise ValueError("Unknown metric identifier")

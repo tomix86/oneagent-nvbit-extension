@@ -1,5 +1,5 @@
 {
-  "version": "1.0.35",
+  "version": "1.0.39",
   "name": "custom.python.nvbit_extension",
   "type": "python",
   "requiredAgentVersion": "1.191",
