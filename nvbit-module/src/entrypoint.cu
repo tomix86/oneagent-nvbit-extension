@@ -111,11 +111,13 @@ if we are exiting a kernel launch:
     3. Print the thread instruction counters
     4. Release the lock
 */
-static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params, const std::string& instrumentationFunction) {
+static void instrumentKernelWithInstructionCounter(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params) {
     static uint32_t kernel_id = 0; // kernel id counter, maintained in system memory
     static pthread_mutex_t mutex; // used to prevent multiple kernels to run concurrently and therefore to "corrupt" the counter variable
 
     const auto kernelName = nvbit_get_func_name(context, params->f, config::get().mangled ? 1 : 0);
+
+    constexpr auto instrumentationFunction{NAME_OF(INSTRUMENTATION__INSTRUCTIONS_COUNT)};
 
     if (!is_exit) {
         logging::info("Instrumenting kernel {} with {} function", kernelName, instrumentationFunction);
@@ -145,6 +147,47 @@ static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cud
     }
 }
 
+static void instrumentKernelWithOccupancyCounter(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params) {
+    if (is_exit) {
+        return;
+    }
+
+    const auto kernelName = nvbit_get_func_name(context, params->f, config::get().mangled ? 1 : 0);
+
+
+    logging::info("Instrumenting kernel {} with occupancy calculation", kernelName);
+
+    int device{};
+    checkCudaErrors(cudaGetDevice(&device));
+
+    int maxBlocks{};
+    checkCudaErrors(cudaDeviceGetAttribute(&maxBlocks, cudaDevAttrMaxBlocksPerMultiprocessor, device));
+
+    //TODO: Documentation for cuLaunchKernel_params: https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__EXEC.html#group__CUDA__EXEC_1gb8f3dc3031b40da29d5f9a7139e52e15
+    const auto kernelLaunchParams = reinterpret_cast<cuLaunchKernel_params*>(params);
+    const auto num_ctas = kernelLaunchParams->gridDimX * kernelLaunchParams->gridDimY * kernelLaunchParams->gridDimZ;
+
+    int numBlocks{};
+    /*checkCudaErrors(*/cuOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocks, params->f, num_ctas, kernelLaunchParams->sharedMemBytes)/*)*/;
+    const auto occupancy{100 * numBlocks / maxBlocks};
+
+    //TODO: do it only at kernel launch, skip if event is not a launch
+    logging::info("kernel {} occupancy: {}% ({} / {})", kernelName, occupancy, numBlocks, maxBlocks);
+    measurementsPublisher.publish(NAME_OF(INSTRUMENTATION__OCCUPANCY), std::to_string(occupancy));
+}
+
+static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params, const std::vector<std::string> & instrumentationFunctions) {
+    for(const auto& functionName : instrumentationFunctions) {
+        if(functionName == NAME_OF(INSTRUMENTATION__INSTRUCTIONS_COUNT)) {
+            instrumentKernelWithInstructionCounter(context, is_exit, eventId, params);
+        } else if (functionName == NAME_OF(INSTRUMENTATION__OCCUPANCY)) {
+            instrumentKernelWithOccupancyCounter(context, is_exit, eventId, params);
+        } else {
+            logging::warning("Unexpected instrumentation function name", functionName);
+        }
+    }
+}
+
 void nvbit_at_init() {
     logging::info("NVBit runtime initializing");
 
@@ -163,9 +206,7 @@ void nvbit_at_cuda_event(CUcontext context, int is_exit, nvbit_api_cuda_t eventI
     const auto launchEvents = {API_CUDA_cuLaunch, API_CUDA_cuLaunchKernel_ptsz, API_CUDA_cuLaunchGrid, API_CUDA_cuLaunchGridAsync, API_CUDA_cuLaunchKernel};
     if (boost::algorithm::any_of_equal(launchEvents, eventId)) {
         const auto instrumentationFunctions = runtimeConfigPoller.getConfig().getInstrumentationFunctions();
-        if(!instrumentationFunctions.empty()) {
-            instrumentKernelLaunch(context, is_exit, eventId, static_cast<cuLaunch_params*>(params), instrumentationFunctions.front());
-        }
+        instrumentKernelLaunch(context, is_exit, eventId, static_cast<cuLaunch_params*>(params), instrumentationFunctions);
     } else if (eventId == API_CUDA_cuProfilerStart && is_exit) {
         if (!config::get().active_from_start) {
             active_region = true;

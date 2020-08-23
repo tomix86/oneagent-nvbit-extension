@@ -39,7 +39,11 @@ void RuntimeConfiguration::load(const std::string& filePath) {
         }
 
         try {
-            instrumentationFunctions.push_back(std::stoi(tokens.back()));
+            std::vector<std::string> functionIds;
+            boost::split(functionIds, tokens.back(), boost::is_any_of(","));
+            for(const auto& id : functionIds) {
+                instrumentationFunctions.push_back(std::stoi(id));
+            }
         } catch(const std::exception&) {
             throw std::runtime_error{"malformed key encountered: " + tokens.back()};
         }

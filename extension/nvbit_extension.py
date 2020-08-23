@@ -1,3 +1,4 @@
+from itertools import groupby
 from typing import Dict, List, Tuple
 
 from ruxit.api.base_plugin import BasePlugin
@@ -12,7 +13,6 @@ from communication.metric_to_id_mapping import InstrumentationFunction
 """
 For documentation see README.md
 """
-
 
 class NVBitExtension(BasePlugin):
     devices_count: int = 0
@@ -60,23 +60,11 @@ class NVBitExtension(BasePlugin):
                 self.logger.info(f"Sending '{key} = {value}' metric for '{pgi.group_name}' process group (PGIID={pgi_id:02x}, type={pgi.process_type})")
                 self.set_pgi_results(pgi_id, key, value)
 
-    def addMetricValue(self, metrics: Dict[int, Dict[str, float]], name: str, value: float):
-        try:
-            metrics[name] += value
-        except KeyError:
-            metrics[name] = value
-
     def process_measurements(self, measurements: Measurements) -> Dict[int, Dict[str, float]]:
         metrics = {}
         for pid, raw_metrics in measurements.items():
-            aggregated_pid_metrics = {}
-            for id, value in raw_metrics:
-                name = InstrumentationFunction.get_metric_name(id)
-                self.addMetricValue(aggregated_pid_metrics, name, value)
-            
-            metrics[pid] = aggregated_pid_metrics
-
-        #TODO: metrics postprocessing, e.g. divide INSTRUCTIONS_COUNT by 60
+            groupped_metrics = [(id, [v for _,v in value]) for (id, value) in groupby(sorted(raw_metrics), lambda x:x[0])]
+            metrics[pid] = { InstrumentationFunction.get_metric_name(id):InstrumentationFunction.aggregate_samples(id, values) for id,values in groupped_metrics }
 
         return metrics
                 

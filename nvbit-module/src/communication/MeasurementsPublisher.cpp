@@ -43,13 +43,13 @@ void MeasurementsPublisher::publish(const std::string& instrumentationFunctionNa
     const auto outputFileName{std::filesystem::path{outputDir}.lexically_normal() / getFileName()};
     
     //TODO: atomic save
-    std::ofstream output{outputFileName};
+    std::ofstream output{outputFileName, std::ios::app};
     if(!output) {
         logging::error("Failed to open output file {}: {}", outputFileName.string(), util::getLastErrno());
     }
 
     output << idFromName(instrumentationFunctionName) << ":" << result << std::endl;
-    logging::info("Published results to {}", outputFileName.string());
+    logging::info("Published results ({}: {}) to {}", instrumentationFunctionName, result, outputFileName.string());
 }
 
 } // namespace communication

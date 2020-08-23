@@ -5,3 +5,5 @@
 
 //TODO: A short description goes here
 #define INSTRUMENTATION__INSTRUCTIONS_COUNT instructionsCount
+
+#define INSTRUMENTATION__OCCUPANCY occupancy

@@ -6,8 +6,9 @@
 #include <algorithm>
 #include <stdexcept>
 
-const std::array<std::string, 1> intrumentationFunctionIdToName {
-    NAME_OF(INSTRUMENTATION__INSTRUCTIONS_COUNT)
+const std::array<std::string, 2> intrumentationFunctionIdToName {
+    NAME_OF(INSTRUMENTATION__INSTRUCTIONS_COUNT),
+    NAME_OF(INSTRUMENTATION__OCCUPANCY)
 };
 
 namespace communication {
