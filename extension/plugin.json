@@ -29,7 +29,7 @@
         "key": "gpu_occupancy",
         "unit": "Percent",
         "aggregation": "count",
-        "displayname": "GPU memory used by the process"
+        "displayname": "Average occupancy achieved by kernels"
       }
     },
     {
