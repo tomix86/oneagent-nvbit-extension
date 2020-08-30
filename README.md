@@ -29,7 +29,7 @@ There is no support for sending separate timeseries per device.
 
 ## Configuration
 
-See [extension README](extension/README.md#Configuration).
+See [extension README](extension/README.md#configuration).
 
 ## Reported metrics
 
