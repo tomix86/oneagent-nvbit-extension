@@ -1,6 +1,6 @@
 #include "RuntimeConfiguration.h"
 
-#include "../ErrorUtil.h"
+#include "ErrorUtil.h"
 #include "FunctionToIdMapping.h"
 
 #include <boost/algorithm/string.hpp>

@@ -37,11 +37,10 @@
 
 #include "functions_registry.h"
 
-//TODO: always add project root as include dir
-#include "../Configuration.h"
-#include "../Logger.h"
-#include "../communication/MeasurementsPublisher.h"
-#include "../cuda_utilities.h"
+#include "Configuration.h"
+#include "Logger.h"
+#include "communication/MeasurementsPublisher.h"
+#include "cuda_utilities.h"
 
 namespace count_instr {
 

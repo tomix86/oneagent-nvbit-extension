@@ -1,7 +1,7 @@
 #include "MeasurementsPublisher.h"
 
-#include "../Logger.h"
-#include "../ErrorUtil.h"
+#include "Logger.h"
+#include "ErrorUtil.h"
 #include "FunctionToIdMapping.h"
 
 #include <filesystem>

@@ -1,6 +1,6 @@
 #include "FunctionToIdMapping.h"
 
-#include "../device_functions/functions_registry.h"
+#include "device_functions/functions_registry.h"
 
 #include <array>
 #include <algorithm>

@@ -1,7 +1,7 @@
 #include "RuntimeConfigurationPoller.h"
 
 #include "RuntimeConfiguration.h"
-#include "../Logger.h"
+#include "Logger.h"
 
 #include <boost/algorithm/string/join.hpp>
 
