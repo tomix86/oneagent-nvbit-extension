@@ -41,12 +41,7 @@
 #include "../Configuration.h"
 #include "../Logger.h"
 #include "../communication/MeasurementsPublisher.h"
-
-void checkError(cudaError_t result, const char* calledFunc, std::string file, int line) {
-    if (!result) { return; }
-    const auto relativeFilePath = file.substr(file.rfind("src/"));
-    logging::info("{} failed ({}:{}) code {} ({})", calledFunc, relativeFilePath, line, result, cudaGetErrorString(result));
-}
+#include "../cuda_utilities.h"
 
 namespace count_instr {
 

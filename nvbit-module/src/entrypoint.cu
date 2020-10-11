@@ -31,6 +31,7 @@
 #include "device_functions/count_instrs.h"
 #include "communication/RuntimeConfigurationPoller.h"
 #include "communication/MeasurementsPublisher.h"
+#include "cuda_utilities.h"
 
 #include <nvbit_tool.h> // Must be included only once!
 #include <nvbit.h>
