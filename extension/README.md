@@ -1,4 +1,4 @@
-# Extemsions implementation
+# Extension implementation
 
 ## Overview
 

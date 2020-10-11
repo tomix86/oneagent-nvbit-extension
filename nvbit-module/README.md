@@ -1,6 +1,6 @@
 # Native module for OneAgent NVBit extension
 
-## What is it
+## Overview
 
 ...
 
@@ -18,17 +18,17 @@
 ### Set up vcpkg
 
 ```sh
-$ git clone https://github.com/Microsoft/vcpkg.git
-$ cd vcpkg
-$ ./bootstrap-vcpkg.sh
-$ ./vcpkg integrate install
-$ ./vcpkg install spdlog:x64-linux boost-program-options:x64-linux
+git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.sh
+./vcpkg integrate install
+./vcpkg install spdlog:x64-linux boost-program-options:x64-linux
 ```
 
 ### Build the project
 
 ```sh
-$ mkdir build
-$ cd build
-$ cmake -G "Unix Makefiles" -DNVBIT_PATH="<path_to_nvbit_release>" -DCMAKE_TOOLCHAIN_FILE="<vcpkg_directory>/scripts/buildsystems/vcpkg.cmake" ..
+mkdir build
+cd build
+cmake -G "Unix Makefiles" -DNVBIT_PATH="<path_to_nvbit_release>" -DCMAKE_TOOLCHAIN_FILE="<vcpkg_directory>/scripts/buildsystems/vcpkg.cmake" ..
 ```
