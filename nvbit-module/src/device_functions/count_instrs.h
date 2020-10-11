@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nvbit.h"
+#include <nvbit.h>
 
 namespace communication {
 class MeasurementsPublisher;

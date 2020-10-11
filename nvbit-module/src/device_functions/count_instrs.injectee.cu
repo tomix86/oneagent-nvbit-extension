@@ -25,12 +25,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <cstdint>
-#include <cuda_runtime.h>
-
-#include "utils/utils.h"
-
 #include "functions_registry.h"
+
+#include <cstdint>
+#include <utils/utils.h>
+
+#include <cuda_runtime.h>
 
 namespace count_instr {
 

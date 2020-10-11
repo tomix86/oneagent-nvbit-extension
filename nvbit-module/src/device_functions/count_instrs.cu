@@ -27,20 +27,19 @@
 
 #include "count_instrs.h"
 
-#include <cstdint>
-#include <unordered_set>
-#include <mutex>
-#include <cuda_runtime.h>
-
-#include "nvbit.h"
-#include "utils/utils.h"
-
 #include "functions_registry.h"
-
 #include "Configuration.h"
 #include "Logger.h"
 #include "communication/MeasurementsPublisher.h"
 #include "cuda_utilities.h"
+
+#include <nvbit.h>
+#include <utils/utils.h>
+
+#include <cstdint>
+#include <unordered_set>
+#include <mutex>
+#include <cuda_runtime.h>
 
 namespace count_instr {
 
