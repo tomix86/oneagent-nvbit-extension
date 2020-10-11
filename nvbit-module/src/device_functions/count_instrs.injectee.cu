@@ -26,8 +26,13 @@
  */
 
 #include <cstdint>
+#include <cuda_runtime.h>
+
 #include "utils/utils.h"
+
 #include "functions_registry.h"
+
+namespace count_instr {
 
 extern "C" __device__ __noinline__ void INSTRUMENTATION__INSTRUCTIONS_COUNT(int predicate, int count_warp_level, uint64_t pcounter) {
     const int active_mask = ballot(1); /* all the active threads will compute the active mask (ballot() is implemented in utils/utils.h)*/  
@@ -46,4 +51,6 @@ extern "C" __device__ __noinline__ void INSTRUMENTATION__INSTRUCTIONS_COUNT(int 
     } else {
         atomicAdd(reinterpret_cast<unsigned long long*>(pcounter), num_threads);
     }
+}
+
 }

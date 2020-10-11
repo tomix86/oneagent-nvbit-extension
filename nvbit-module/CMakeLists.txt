@@ -12,12 +12,13 @@ include_directories(${NVBIT_PATH}/core)
 link_directories(${NVBIT_PATH}/core)
 
 file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
-file(GLOB_RECURSE DEVICE_SOURCES "${CMAKE_SOURCE_DIR}/src/device_functions/*.cu")
-set(ENTRYPOINT_SOURCE "${CMAKE_SOURCE_DIR}/src/entrypoint.cu")
+file(GLOB_RECURSE DEVICE_SOURCES "${CMAKE_SOURCE_DIR}/src/device_functions/*.injectee.cu")
+file(GLOB_RECURSE ENTRYPOINT_SOURCES "${CMAKE_SOURCE_DIR}/src/device_functions/*.entrypoint.cu")
+list(APPEND ENTRYPOINT_SOURCES "${CMAKE_SOURCE_DIR}/src/entrypoint.cu")
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --gpu-architecture=sm_35 -D_FORCE_INLINES --compiler-options=-Wall,-fPIC")
 
-add_library(entrypoint OBJECT ${ENTRYPOINT_SOURCE})
+add_library(entrypoint OBJECT ${ENTRYPOINT_SOURCES})
 target_compile_options(entrypoint PRIVATE -O3 --relocatable-device-code=true --ptxas-options=-cloning=no)
 target_link_libraries(entrypoint PRIVATE spdlog::spdlog)
 
