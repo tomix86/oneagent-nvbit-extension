@@ -43,7 +43,6 @@
 
 namespace count_instr {
 
-bool active_region = true; // used to select region of insterest when active from start is off
 __managed__ uint64_t counter = 0; // kernel instruction counter, updated by the GPU
 uint64_t tot_app_instrs = 0; // total instruction counter, maintained in system memory, incremented by "counter" every time a kernel completes
 
@@ -71,10 +70,6 @@ static void instrumentFunctionIfNeeded(CUcontext context, CUfunction func, const
         }
 
         for (auto instruction : instructions) {
-            if(!is_in_range(instruction->getIdx(), config::get().instr_begin_interval, config::get().instr_end_interval)) {
-                continue;
-            }
-
             // If verbose we print which instruction we are instrumenting (both offset in the function and SASS string)
             if (config::get().verbose) {
                 instruction->print();
@@ -120,11 +115,7 @@ void instrumentKernelWithInstructionCounter(CUcontext context, int is_exit, nvbi
         mutex.lock();
         instrumentFunctionIfNeeded(context, params->f, instrumentationFunction);
 
-        if (config::get().active_from_start) {
-            active_region = is_in_range(kernel_id, config::get().start_grid_num, config::get().end_grid_num);
-        }
-
-        nvbit_enable_instrumented(context, params->f, active_region);
+        nvbit_enable_instrumented(context, params->f, true);
         counter = 0;
     } else {
         checkCudaErrors(cudaDeviceSynchronize());

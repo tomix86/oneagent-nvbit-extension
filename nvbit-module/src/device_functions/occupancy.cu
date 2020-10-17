@@ -26,7 +26,7 @@ void instrumentKernelWithOccupancyCounter(CUcontext context, int is_exit, nvbit_
     int maxBlocks{};
     checkCudaErrors(cudaDeviceGetAttribute(&maxBlocks, cudaDevAttrMaxBlocksPerMultiprocessor, device));
 
-    //TODO: Documentation for cuLaunchKernel_params: https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__EXEC.html#group__CUDA__EXEC_1gb8f3dc3031b40da29d5f9a7139e52e15
+    // Documentation for cuLaunchKernel_params is available here: https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__EXEC.html#group__CUDA__EXEC_1gb8f3dc3031b40da29d5f9a7139e52e15
     const auto kernelLaunchParams = reinterpret_cast<cuLaunchKernel_params*>(params);
     const auto num_ctas = kernelLaunchParams->gridDimX * kernelLaunchParams->gridDimY * kernelLaunchParams->gridDimZ;
 
@@ -34,7 +34,6 @@ void instrumentKernelWithOccupancyCounter(CUcontext context, int is_exit, nvbit_
     /*checkCudaErrors(*/cuOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocks, params->f, num_ctas, kernelLaunchParams->sharedMemBytes)/*)*/;
     const auto occupancy{100 * numBlocks / maxBlocks};
 
-    //TODO: do it only at kernel launch, skip if event is not a launch
     logging::info("kernel {} occupancy: {}% ({} / {})", kernelName, occupancy, numBlocks, maxBlocks);
     measurementsPublisher.publish(NAME_OF(INSTRUMENTATION__OCCUPANCY), std::to_string(occupancy));
 }

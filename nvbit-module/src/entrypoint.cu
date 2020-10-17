@@ -58,10 +58,6 @@ void nvbit_at_init() {
     // Make sure all managed variables are allocated on GPU
     setenv("CUDA_MANAGED_FORCE_DEVICE_ALLOC", "1", 1);
 
-    if (!config::get().active_from_start) {
-        count_instr::active_region = false;
-    }
-
     runtimeConfigPoller.initialize(config::get().runtime_config_path, config::get().runtime_config_polling_interval);
     measurementsPublisher.initialize(config::get().measurements_output_dir);
 }
@@ -71,14 +67,6 @@ void nvbit_at_cuda_event(CUcontext context, int is_exit, nvbit_api_cuda_t eventI
     if (boost::algorithm::any_of_equal(launchEvents, eventId)) {
         const auto instrumentationFunctions = runtimeConfigPoller.getConfig().getInstrumentationFunctions();
         instrumentKernelLaunch(context, is_exit, eventId, static_cast<cuLaunch_params*>(params), instrumentationFunctions);
-    } else if (eventId == API_CUDA_cuProfilerStart && is_exit) {
-        if (!config::get().active_from_start) {
-            count_instr::active_region = true;
-        }
-    } else if (eventId == API_CUDA_cuProfilerStop && is_exit) {
-        if (!config::get().active_from_start) {
-            count_instr::active_region = false;
-        }
     }
 }
 
