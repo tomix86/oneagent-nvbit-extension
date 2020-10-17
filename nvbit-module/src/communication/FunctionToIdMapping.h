@@ -1,11 +1,17 @@
 #pragma once
 
+#include <stdexcept>
 #include <string>
 
 namespace communication {
 
-std::string nameFromId(int instrumentationFunctionId);
-int idFromName(const std::string& instrumentationFunctionName);
-bool isIdValid(int instrumentationFunctionId);
+enum class InstrumentationId {
+    instructions_count,
+    occupancy
+};
+
+std::string to_string(InstrumentationId id);
+
+bool isInstrumentationIdValid(int id);
 
 } // namespace communication

@@ -1,4 +1,4 @@
-#include "functions_registry.h"
+#include "count_instrs.h"
 
 #include <cstdint>
 #include <utils/utils.h>
@@ -7,7 +7,7 @@
 
 namespace count_instr {
 
-extern "C" __device__ __noinline__ void INSTRUMENTATION__INSTRUCTIONS_COUNT(int predicate, int count_warp_level, uint64_t pcounter) {
+extern "C" __device__ __noinline__ void IMPL_DETAIL_COUNT_INSTR_KERNEL(int predicate, int count_warp_level, uint64_t pcounter) {
     const int active_mask = ballot(1); /* all the active threads will compute the active mask (ballot() is implemented in utils/utils.h)*/  
     const int laneid = get_laneid(); /* each thread will get a lane id (get_lane_id is implemented in utils/utils.h) */
     const int first_laneid = __ffs(active_mask) - 1; /* get the id of the first active thread */

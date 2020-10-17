@@ -1,6 +1,5 @@
 #include "Configuration.h"
 #include "Logger.h"
-#include "device_functions/functions_registry.h"
 #include "device_functions/count_instrs.h"
 #include "device_functions/occupancy.h"
 #include "communication/RuntimeConfigurationPoller.h"
@@ -13,14 +12,17 @@
 communication::RuntimeConfigurationPoller runtimeConfigPoller;
 communication::MeasurementsPublisher measurementsPublisher;
 
-static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params, const std::vector<std::string> & instrumentationFunctions) {
-    for(const auto& functionName : instrumentationFunctions) {
-        if(functionName == NAME_OF(INSTRUMENTATION__INSTRUCTIONS_COUNT)) {
-            count_instr::instrumentKernelWithInstructionCounter(context, is_exit, eventId, params, measurementsPublisher);
-        } else if (functionName == NAME_OF(INSTRUMENTATION__OCCUPANCY)) {
-            occupancy::instrumentKernelWithOccupancyCounter(context, is_exit, eventId, params, measurementsPublisher);
-        } else {
-            logging::warning("Unexpected instrumentation function name", functionName);
+static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params, const std::vector<communication::InstrumentationId>& instrumentationFunctions) {
+    for(const auto& functionId : instrumentationFunctions) {
+        switch(functionId) {
+            case communication::InstrumentationId::instructions_count:
+                count_instr::instrumentKernelWithInstructionCounter(context, is_exit, eventId, params, measurementsPublisher);
+                break;
+            case communication::InstrumentationId::occupancy:
+                occupancy::instrumentKernelWithOccupancyCounter(context, is_exit, eventId, params, measurementsPublisher);
+                break;
+            default:
+                break;
         }
     }
 }

@@ -2,7 +2,7 @@
 
 #include "Logger.h"
 #include "ErrorUtil.h"
-#include "FunctionToIdMapping.h"
+#include "util.h"
 
 #include <filesystem>
 #include <fstream>
@@ -12,6 +12,7 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
+
 
 using std::chrono::system_clock;
 
@@ -35,7 +36,7 @@ static std::string getFileName() {
     return ss.str();
 }
 
-void MeasurementsPublisher::publish(const std::string& instrumentationFunctionName, const std::string& result){
+void MeasurementsPublisher::publish(InstrumentationId instrumentationFunctionId, const std::string& result){
     if(outputDir.empty()){
         return;
     }
@@ -48,8 +49,8 @@ void MeasurementsPublisher::publish(const std::string& instrumentationFunctionNa
         logging::error("Failed to open output file {}: {}", outputFileName.string(), util::getLastErrno());
     }
 
-    output << idFromName(instrumentationFunctionName) << ":" << result << std::endl;
-    logging::info("Published results ({}: {}) to {}", instrumentationFunctionName, result, outputFileName.string());
+    output << util::to_underlying_type(instrumentationFunctionId) << ":" << result << std::endl;
+    logging::info("Published results ({}: {}) to {}", to_string(instrumentationFunctionId), result, outputFileName.string());
 }
 
 } // namespace communication

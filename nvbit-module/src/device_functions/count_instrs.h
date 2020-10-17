@@ -2,6 +2,8 @@
 
 #include <nvbit.h>
 
+#define IMPL_DETAIL_COUNT_INSTR_KERNEL instructionsCount
+
 namespace communication {
 class MeasurementsPublisher;
 }

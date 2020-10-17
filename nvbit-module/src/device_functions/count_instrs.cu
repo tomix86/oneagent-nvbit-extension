@@ -1,10 +1,11 @@
 #include "count_instrs.h"
 
-#include "functions_registry.h"
 #include "Configuration.h"
 #include "Logger.h"
+#include "communication/FunctionToIdMapping.h"
 #include "communication/MeasurementsPublisher.h"
 #include "cuda_utilities.h"
+#include "preprocessor.h"
 
 #include <nvbit.h>
 #include <utils/utils.h>
@@ -18,12 +19,6 @@ namespace count_instr {
 
 __managed__ uint64_t counter = 0; // kernel instruction counter, updated by the GPU
 uint64_t tot_app_instrs = 0; // total instruction counter, maintained in system memory, incremented by "counter" every time a kernel completes
-
-// Test whether val ∈ [low; high)
-template <typename T>
-bool is_in_range(const T& val, const T& low, const T& high) {
-    return val >= low && val < high;
-}
 
 static void instrumentFunctionIfNeeded(CUcontext context, CUfunction func, const std::string& instrumentationFunction) {
     static std::unordered_set<CUfunction> already_instrumented;
@@ -80,13 +75,11 @@ void instrumentKernelWithInstructionCounter(CUcontext context, int is_exit, nvbi
 
     const auto kernelName = nvbit_get_func_name(context, params->f, config::get().mangled ? 1 : 0);
 
-    constexpr auto instrumentationFunction{NAME_OF(INSTRUMENTATION__INSTRUCTIONS_COUNT)};
-
     if (!is_exit) {
-        logging::info("Instrumenting kernel {} with {} function", kernelName, instrumentationFunction);
+        logging::info("Instrumenting kernel {} with {} function", kernelName, STRINGIZE(IMPL_DETAIL_COUNT_INSTR_KERNEL));
 
         mutex.lock();
-        instrumentFunctionIfNeeded(context, params->f, instrumentationFunction);
+        instrumentFunctionIfNeeded(context, params->f, STRINGIZE(IMPL_DETAIL_COUNT_INSTR_KERNEL));
 
         nvbit_enable_instrumented(context, params->f, true);
         counter = 0;
@@ -101,7 +94,7 @@ void instrumentKernelWithInstructionCounter(CUcontext context, int is_exit, nvbi
         }
 
         logging::info("kernel {} - {} - #thread-blocks {},  kernel instructions {}, total instructions {}", kernel_id++, kernelName, num_ctas, counter, tot_app_instrs);
-        measurementsPublisher.publish(instrumentationFunction, std::to_string(counter));
+        measurementsPublisher.publish(communication::InstrumentationId::instructions_count, std::to_string(counter));
         mutex.unlock();
     }
 }

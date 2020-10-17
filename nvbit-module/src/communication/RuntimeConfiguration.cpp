@@ -1,7 +1,6 @@
 #include "RuntimeConfiguration.h"
 
 #include "ErrorUtil.h"
-#include "FunctionToIdMapping.h"
 
 #include <boost/algorithm/string.hpp>
 #include <fstream>
@@ -50,11 +49,11 @@ void RuntimeConfiguration::load(const std::string& filePath) {
     }
 }
 
-std::vector<std::string> RuntimeConfiguration::getInstrumentationFunctions() const {
-    std::vector<std::string> result;
+std::vector<InstrumentationId> RuntimeConfiguration::getInstrumentationFunctions() const {
+    std::vector<InstrumentationId> result;
     for(auto functionId : instrumentationFunctions) {
-        if(isIdValid(functionId)) {
-            result.push_back(nameFromId(functionId));
+        if(isInstrumentationIdValid(functionId)) {
+            result.push_back(InstrumentationId{functionId});
         }
     }
 

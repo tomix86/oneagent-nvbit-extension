@@ -4,10 +4,13 @@
 #include "Logger.h"
 
 #include <boost/algorithm/string/join.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 
 using namespace std::chrono_literals;
 
 using std::chrono::steady_clock;
+using boost::algorithm::join;
+using boost::adaptors::transformed;
 
 namespace communication {
 
@@ -24,7 +27,7 @@ void RuntimeConfigurationPoller::initialize(std::string filePath, std::chrono::s
 
                 try {
                     config.load(filePath);
-                    logging::debug("Loaded runtime configuration: {}", boost::algorithm::join(config.getInstrumentationFunctions(), " "));
+                    logging::debug("Loaded runtime configuration: {}", join(config.getInstrumentationFunctions() | transformed(to_string), " "));
                 } catch(const std::exception& ex) {
                     logging::error("Failed to load runtime configuration file: {}", ex.what());
                 }

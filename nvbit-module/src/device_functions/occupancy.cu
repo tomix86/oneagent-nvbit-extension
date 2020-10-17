@@ -1,8 +1,8 @@
 #include "occupancy.h"
 
 #include "cuda_utilities.h"
-#include "functions_registry.h"
 #include "Logger.h"
+#include "communication/FunctionToIdMapping.h"
 #include "communication/MeasurementsPublisher.h"
 #include "Configuration.h"
 
@@ -35,7 +35,7 @@ void instrumentKernelWithOccupancyCounter(CUcontext context, int is_exit, nvbit_
     const auto occupancy{100 * numBlocks / maxBlocks};
 
     logging::info("kernel {} occupancy: {}% ({} / {})", kernelName, occupancy, numBlocks, maxBlocks);
-    measurementsPublisher.publish(NAME_OF(INSTRUMENTATION__OCCUPANCY), std::to_string(occupancy));
+    measurementsPublisher.publish(communication::InstrumentationId::occupancy, std::to_string(occupancy));
 }
 
 }
