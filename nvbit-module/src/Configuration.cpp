@@ -13,6 +13,14 @@
 
 namespace po = boost::program_options;
 
+template <typename Rep, typename Period>
+std::istream& operator>>(std::istream& str, std::chrono::duration<Rep, Period>& value) {
+    Rep tmp;
+    str >> tmp;
+    value = std::chrono::duration<Rep, Period>{tmp};
+    return str;
+}
+
 namespace config {
 
 static Configuration configHolder;
@@ -37,7 +45,7 @@ void Configuration::print(std::function<void(std::string line)> linePrinter) con
     linePrinter("active_from_start: " + to_string(active_from_start));
     linePrinter("mangled: " + to_string(mangled));
     linePrinter("runtime config path: " + runtime_config_path);
-    linePrinter("runtime config polling interval: " + std::to_string(runtime_config_polling_interval) + "s");
+    linePrinter("runtime config polling interval: " + std::to_string(runtime_config_polling_interval.count()) + "s");
     linePrinter("measurements output directory: " + measurements_output_dir);
 }
 
@@ -63,7 +71,7 @@ static void parseConfigFile(Configuration& config, std::ifstream& file) {
         ("active_from_start", po::value<bool>(&config.active_from_start), "Start instruction counting from start or wait for cuProfilerStart and cuProfilerStop")
         ("mangled_names", po::value<bool>(&config.mangled), "Print kernel names mangled or not")
         ("runtime_config_path", po::value<std::string>(&config.runtime_config_path), "Path to runtime configuration file")
-        ("runtime_config_polling_interval", po::value<uint32_t>(&config.runtime_config_polling_interval), "Runtime configuration file polling interval")
+        ("runtime_config_polling_interval", po::value<std::chrono::seconds>(&config.runtime_config_polling_interval), "Runtime configuration file polling interval")
         ("measurements_output_dir", po::value<std::string>(&config.measurements_output_dir), "Path to results output directory")
     ;
 

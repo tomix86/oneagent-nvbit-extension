@@ -62,7 +62,7 @@ void nvbit_at_init() {
         count_instr::active_region = false;
     }
 
-    runtimeConfigPoller.initialize(config::get().runtime_config_path, std::chrono::seconds{config::get().runtime_config_polling_interval});
+    runtimeConfigPoller.initialize(config::get().runtime_config_path, config::get().runtime_config_polling_interval);
     measurementsPublisher.initialize(config::get().measurements_output_dir);
 }
 
