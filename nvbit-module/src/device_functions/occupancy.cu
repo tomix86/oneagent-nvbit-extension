@@ -1,6 +1,6 @@
 #include "occupancy.h"
 
-#include "cuda_utilities.h"
+#include "util/cuda_utilities.h"
 #include "Logger.h"
 #include "communication/FunctionToIdMapping.h"
 #include "communication/MeasurementsPublisher.h"
@@ -8,9 +8,9 @@
 
 #include <cuda_runtime.h>
 
-namespace occupancy {
+namespace device::occupancy {
 
-void instrumentKernelWithOccupancyCounter(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params, communication::MeasurementsPublisher& measurementsPublisher) {
+void instrumentKernel(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params, communication::MeasurementsPublisher& measurementsPublisher) {
     if (is_exit) {
         return;
     }

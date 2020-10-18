@@ -16,10 +16,10 @@ static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cud
     for(const auto& functionId : instrumentationFunctions) {
         switch(functionId) {
             case communication::InstrumentationId::instructions_count:
-                count_instr::instrumentKernelWithInstructionCounter(context, is_exit, eventId, params, measurementsPublisher);
+                device::count_instr::instrumentKernel(context, is_exit, eventId, params, measurementsPublisher);
                 break;
             case communication::InstrumentationId::occupancy:
-                occupancy::instrumentKernelWithOccupancyCounter(context, is_exit, eventId, params, measurementsPublisher);
+                device::occupancy::instrumentKernel(context, is_exit, eventId, params, measurementsPublisher);
                 break;
             default:
                 break;
@@ -28,7 +28,7 @@ static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cud
 }
 
 void nvbit_at_init() {
-    logging::info("NVBit runtime initializing, version: " NVBIT_VERSION);
+    logging::info("NVBit runtime initializing, version: {}", NVBIT_VERSION);
 
     // Make sure all managed variables are allocated on GPU
     setenv("CUDA_MANAGED_FORCE_DEVICE_ALLOC", "1", 1);

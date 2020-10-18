@@ -1,6 +1,6 @@
 #include "Configuration.h"
 
-#include "ErrorUtil.h"
+#include "util/ErrorUtil.h"
 
 #include <cstdlib>
 #include <optional>

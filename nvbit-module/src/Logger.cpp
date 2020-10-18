@@ -28,4 +28,5 @@ void initialize(const std::string& logFilePath) try {
 } catch (const spdlog::spdlog_ex& ex) {
     throw std::runtime_error{"Logger initialization failed: "s + ex.what()};
 }
+
 }

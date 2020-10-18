@@ -1,6 +1,6 @@
 #include "RuntimeConfiguration.h"
 
-#include "ErrorUtil.h"
+#include "util/ErrorUtil.h"
 
 #include <boost/algorithm/string.hpp>
 #include <fstream>

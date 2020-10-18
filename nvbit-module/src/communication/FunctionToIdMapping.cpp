@@ -1,6 +1,6 @@
 #include "FunctionToIdMapping.h"
 
-#include "util.h"
+#include "util/util.h"
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 

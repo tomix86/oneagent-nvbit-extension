@@ -3,5 +3,5 @@
 #include <string>
 
 namespace util {
-    std::string getLastErrno();
+std::string getLastErrno();
 }

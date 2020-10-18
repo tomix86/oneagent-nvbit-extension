@@ -4,8 +4,8 @@
 #include "Logger.h"
 #include "communication/FunctionToIdMapping.h"
 #include "communication/MeasurementsPublisher.h"
-#include "cuda_utilities.h"
-#include "preprocessor.h"
+#include "util/cuda_utilities.h"
+#include "util/preprocessor.h"
 
 #include <nvbit.h>
 #include <utils/utils.h>
@@ -15,7 +15,7 @@
 #include <mutex>
 #include <cuda_runtime.h>
 
-namespace count_instr {
+namespace device::count_instr {
 
 __managed__ uint64_t counter = 0; // kernel instruction counter, updated by the GPU
 uint64_t tot_app_instrs = 0; // total instruction counter, maintained in system memory, incremented by "counter" every time a kernel completes
@@ -69,7 +69,7 @@ if we are exiting a kernel launch:
     3. Print the thread instruction counters
     4. Release the lock
 */
-void instrumentKernelWithInstructionCounter(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params, communication::MeasurementsPublisher& measurementsPublisher) {
+void instrumentKernel(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params, communication::MeasurementsPublisher& measurementsPublisher) {
     static uint32_t kernel_id = 0; // kernel id counter, maintained in system memory
     static std::mutex mutex; // used to prevent multiple kernels to run concurrently and therefore to "corrupt" the counter variable
 

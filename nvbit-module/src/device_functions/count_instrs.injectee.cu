@@ -5,7 +5,7 @@
 
 #include <cuda_runtime.h>
 
-namespace count_instr {
+namespace device::count_instr {
 
 extern "C" __device__ __noinline__ void IMPL_DETAIL_COUNT_INSTR_KERNEL(int predicate, int count_warp_level, uint64_t pcounter) {
     const int active_mask = __ballot_sync(__activemask(), 1); /* all the active threads will compute the active mask */
