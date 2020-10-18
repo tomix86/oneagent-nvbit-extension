@@ -42,6 +42,7 @@ add_library(nvbit-module-static OBJECT ${SOURCES})
 target_link_libraries(nvbit-module-static PUBLIC spdlog::spdlog ${Boost_LIBRARIES} nvbit cuda)
 
 add_library(nvbit-module SHARED "${CMAKE_SOURCE_DIR}/src/main.cpp")
+set_target_properties(nvbit-module PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 target_link_libraries(nvbit-module PRIVATE nvbit-module-static entrypoint)
 
 
