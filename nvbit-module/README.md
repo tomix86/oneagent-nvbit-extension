@@ -13,14 +13,16 @@ ONEAGENT_NVBIT_EXTENSION_CONF_FILE=<path-to>/nvbit-module.conf LD_PRELOAD=<path-
 
 ## External dependencies
 
-* [spdlog](https://github.com/gabime/spdlog) (tested with v1.3.1)
-* [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) (tested with v11.0)
-* [NVBit](https://github.com/NVlabs/NVBit) (tested with v1.5)
-* [Boost](https://www.boost.org/) (tested with v1.71.0)
-* [Google Test](https://github.com/google/googletest) (tested with v1.10.0)
-* [CMake](https://cmake.org/download/) (tested with v3.18.4)
-* [vcpkg](https://github.com/Microsoft/vcpkg)
-* Compiler with C++17 support (tested with gcc 9.3.0)
+| Dependency                                                 | Tested version |
+|------------------------------------------------------------|----------------|
+|[spdlog](https://github.com/gabime/spdlog)                  | 1.3.1          |
+|[CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) | 11.0           |
+|[NVBit](https://github.com/NVlabs/NVBit)                    | 1.5            |
+|[Boost](https://www.boost.org/)                             | 1.71.0         |
+|[Google Test](https://github.com/google/googletest)         | 1.10.0         |
+|[CMake](https://cmake.org/download/)                        | 3.18.4         |
+|[vcpkg](https://github.com/Microsoft/vcpkg)                 | N/A            |
+|Compiler with C++20 support (C++17 for CUDA)                | gcc 10.2.0     |
 
 ## Building
 
