@@ -3,6 +3,7 @@ project(nvbit-module CUDA CXX C)
 
 find_package(spdlog REQUIRED)
 find_package(Boost REQUIRED program_options)
+find_package(GTest REQUIRED)
 
 set(NVBIT_PATH "" CACHE FILEPATH "Path to NVBit release")
 if(NOT EXISTS "${NVBIT_PATH}/core/nvbit_tool.h")
@@ -34,3 +35,14 @@ set_target_properties(nvbit-module PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 target_link_libraries(nvbit-module PRIVATE
                       spdlog::spdlog ${Boost_LIBRARIES} nvbit cuda
                       entrypoint injected_functions)
+
+
+# Unit tests configuration
+include(GoogleTest)
+include(CTest)
+file(GLOB_RECURSE TEST_SOURCES "${CMAKE_SOURCE_DIR}/test/*.cpp" "${CMAKE_SOURCE_DIR}/test/*.cu")
+
+add_executable(nvbit-module-test ${TEST_SOURCES})
+target_link_libraries(nvbit-module-test PRIVATE GTest::GTest GTest::Main)
+
+gtest_discover_tests(nvbit-module-test)
