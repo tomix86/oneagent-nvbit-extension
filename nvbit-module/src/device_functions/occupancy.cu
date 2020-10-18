@@ -31,7 +31,7 @@ void instrumentKernel(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, 
     const auto num_ctas = kernelLaunchParams->gridDimX * kernelLaunchParams->gridDimY * kernelLaunchParams->gridDimZ;
 
     int numBlocks{};
-    /*checkCudaErrors(*/cuOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocks, params->f, num_ctas, kernelLaunchParams->sharedMemBytes)/*)*/;
+    checkCudaErrors(cuOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocks, params->f, num_ctas, kernelLaunchParams->sharedMemBytes));
     const auto occupancy{100 * numBlocks / maxBlocks};
 
     logging::info("kernel {} occupancy: {}% ({} / {})", kernelName, occupancy, numBlocks, maxBlocks);
