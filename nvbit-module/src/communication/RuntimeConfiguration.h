@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include "FunctionToIdMapping.h"
+#include "InstrumentationId.h"
 
 namespace communication {
 

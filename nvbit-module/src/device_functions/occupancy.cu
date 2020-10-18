@@ -2,7 +2,7 @@
 
 #include "util/cuda_utilities.h"
 #include "Logger.h"
-#include "communication/FunctionToIdMapping.h"
+#include "communication/InstrumentationId.h"
 #include "communication/MeasurementsPublisher.h"
 #include "Configuration.h"
 

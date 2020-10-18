@@ -1,4 +1,4 @@
-#include "communication/FunctionToIdMapping.h"
+#include "communication/InstrumentationId.h"
 
 #include <gtest/gtest.h>
 
