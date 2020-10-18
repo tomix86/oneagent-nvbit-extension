@@ -46,7 +46,7 @@ static void instrumentFunctionIfNeeded(CUcontext context, CUfunction func, const
 
             nvbit_insert_call(instruction, instrumentationFunction.c_str(), IPOINT_BEFORE); // Insert a call to instrumentation routine before the instruction
             if (config::get().exclude_pred_off) {
-                nvbit_add_call_arg_pred_val(instruction); // pass predicate value
+                nvbit_add_call_arg_guard_pred_val(instruction); // pass predicate value
             } else {
                 nvbit_add_call_arg_const_val32(instruction, 1); // pass always true
             }

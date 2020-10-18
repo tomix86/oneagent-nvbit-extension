@@ -28,7 +28,7 @@ static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cud
 }
 
 void nvbit_at_init() {
-    logging::info("NVBit runtime initializing");
+    logging::info("NVBit runtime initializing, version: " NVBIT_VERSION);
 
     // Make sure all managed variables are allocated on GPU
     setenv("CUDA_MANAGED_FORCE_DEVICE_ALLOC", "1", 1);
