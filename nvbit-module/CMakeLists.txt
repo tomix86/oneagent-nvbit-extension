@@ -1,5 +1,11 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.18.4)
 project(nvbit-module CUDA CXX C)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CUDA_STANDARD 17)
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
 find_package(spdlog REQUIRED)
 find_package(Boost REQUIRED program_options)
@@ -30,7 +36,6 @@ add_library(injected_functions OBJECT ${DEVICE_SOURCES})
 target_compile_options(injected_functions PRIVATE --maxrregcount=24 --keep-device-functions --ptxas-options=--compile-as-tools-patch)
 
 add_library(nvbit-module SHARED ${SOURCES})
-set_target_properties(nvbit-module PROPERTIES CXX_STANDARD 17)
 set_target_properties(nvbit-module PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 target_link_libraries(nvbit-module PRIVATE
                       spdlog::spdlog ${Boost_LIBRARIES} nvbit cuda

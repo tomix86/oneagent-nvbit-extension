@@ -18,7 +18,7 @@ ONEAGENT_NVBIT_EXTENSION_CONF_FILE=<path-to>/nvbit-module.conf LD_PRELOAD=<path-
 * [NVBit](https://github.com/NVlabs/NVBit) (tested with v1.5)
 * [Boost](https://www.boost.org/) (tested with v1.71.0)
 * [Google Test](https://github.com/google/googletest) (tested with v1.10.0)
-* [CMake](https://cmake.org/download/) (tested with v3.15.5)
+* [CMake](https://cmake.org/download/) (tested with v3.18.4)
 * [vcpkg](https://github.com/Microsoft/vcpkg)
 * Compiler with C++17 support (tested with gcc 9.3.0)
 
