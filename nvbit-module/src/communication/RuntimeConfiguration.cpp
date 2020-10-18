@@ -13,7 +13,7 @@ using namespace std::string_literals;
 namespace communication {
 
 //TODO: thread safety
-void RuntimeConfiguration::load(const std::string& filePath) {
+void RuntimeConfiguration::load(const std::filesystem::path& filePath) {
     //TODO: reload only if file contents changed
 
     std::ifstream input{filePath};

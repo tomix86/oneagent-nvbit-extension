@@ -14,8 +14,8 @@ using boost::adaptors::transformed;
 
 namespace communication {
 
-void RuntimeConfigurationPoller::initialize(std::string filePath, std::chrono::seconds pollingInterval) {
-    logging::info("Runtime configuration will be polled from {} every {}s", filePath, pollingInterval.count());
+void RuntimeConfigurationPoller::initialize(std::filesystem::path filePath, std::chrono::seconds pollingInterval) {
+    logging::info("Runtime configuration will be polled from {} every {}s", filePath.string(), pollingInterval.count());
 
     pollerThread = std::thread([this, filePath = std::move(filePath), pollingInterval](){
         auto begin{steady_clock::now()};

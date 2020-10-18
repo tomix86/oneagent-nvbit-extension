@@ -3,7 +3,6 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 #include <string>
-#include <filesystem>
 
 using namespace std::string_literals;
 
@@ -14,7 +13,7 @@ void default_initialize() try {
 } catch (...){
 }
 
-void initialize(const std::string& logFilePath) try {
+void initialize(const std::filesystem::path& logFilePath) try {
 	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFilePath);
 	file_sink->set_level(spdlog::level::trace);
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <string>
+#include <filesystem>
 
 #include "InstrumentationId.h"
 
@@ -9,7 +9,7 @@ namespace communication {
 
 class RuntimeConfiguration {
 public:
-    void load(const std::string& filePath);
+    void load(const std::filesystem::path& filePath);
 
     std::vector<InstrumentationId> getInstrumentationFunctions() const;
 

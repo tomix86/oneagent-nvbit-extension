@@ -5,12 +5,13 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
+#include <filesystem>
 
 namespace communication {
 
 class RuntimeConfigurationPoller {
 public:
-    void initialize(std::string filePath, std::chrono::seconds pollingInterval);
+    void initialize(std::filesystem::path filePath, std::chrono::seconds pollingInterval);
 
     ~RuntimeConfigurationPoller();
 

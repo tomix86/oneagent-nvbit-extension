@@ -18,15 +18,15 @@ using std::chrono::system_clock;
 
 namespace communication {
 
-void MeasurementsPublisher::initialize(std::string outputDir){ 
+void MeasurementsPublisher::initialize(std::filesystem::path outputDir){ 
     if(!std::filesystem::exists(outputDir)) {
-        logging::error("Measurements output directory {} does not exist", outputDir);
+        logging::error("Measurements output directory {} does not exist", outputDir.string());
         return;
     }
 
     this->outputDir = std::move(outputDir);
 
-    logging::info("Measurements will be published to {}", this->outputDir);
+    logging::info("Measurements will be published to {}", this->outputDir.string());
 }
 
 static std::string getFileName() {
@@ -41,7 +41,7 @@ void MeasurementsPublisher::publish(InstrumentationId instrumentationFunctionId,
         return;
     }
 
-    const auto outputFileName{std::filesystem::path{outputDir}.lexically_normal() / getFileName()};
+    const auto outputFileName{outputDir / getFileName()};
     
     //TODO: atomic save
     std::ofstream output{outputFileName, std::ios::app};

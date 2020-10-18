@@ -1,12 +1,12 @@
 #pragma once
 
 #include <spdlog/spdlog.h>
-#include <string>
+#include <filesystem>
 
 namespace logging {
 void default_initialize();
 
-void initialize(const std::string& logFilePath);
+void initialize(const std::filesystem::path& logFilePath);
 
 template <typename... Ts>
 void error(Ts... args) {
