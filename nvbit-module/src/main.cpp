@@ -22,9 +22,7 @@ void __attribute__((constructor)) initialize() try {
     setenv("NOBANNER", "1", 1);
 
     logging::default_initialize();
-
-    config::initialize();
-    logging::initialize(config::get().logFile);
+    logging::initialize(config::get().logFile, config::get().console_log_enabled);
     
     logging::info("NVBit module loaded, configuration:");
     config::get().print([](auto line){

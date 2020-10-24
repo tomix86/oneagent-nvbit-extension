@@ -34,6 +34,7 @@ void Configuration::print(std::function<void(std::string line)> linePrinter) con
     linePrinter("Config file: " + confFile.string());
     linePrinter("Log file: " + logFile.string());
     linePrinter("verbose: " + to_string(verbose));
+    linePrinter("console_log_enabled: " + to_string(console_log_enabled));
     linePrinter("count_warp_level: " + to_string(count_warp_level));
     linePrinter("exclude_pred_off: " + to_string(exclude_pred_off));
     linePrinter("mangled: " + to_string(mangled));
@@ -55,6 +56,7 @@ static void parseConfigFile(Configuration& config, std::ifstream& file) {
     options.add_options()
         ("logfile", po::value<std::filesystem::path>(&config.logFile), "Log file")
         ("verbose", po::value<bool>(&config.verbose), "Enable verbosity inside the tool")
+        ("console_log_enabled", po::value<bool>(&config.console_log_enabled), "Write logs to stdout")
         ("count_warp_level", po::value<bool>(&config.count_warp_level), "Count warp level or thread level instructions")
         ("exclude_pred_off", po::value<bool>(&config.exclude_pred_off), "Exclude predicated off instruction from count")
         ("mangled_names", po::value<bool>(&config.mangled), "Print kernel names mangled or not")
@@ -87,14 +89,13 @@ static Configuration load() {
     return config;
 }
 
-static Configuration configHolder;
-
-void initialize() {
-    configHolder = load();
-}
-
 const Configuration& get() {
-    return configHolder;
+    static std::optional<Configuration> configHolder;
+    if(!configHolder) [[unlikely]] {
+        configHolder = load();
+    }
+
+    return *configHolder;
 }
 
 } //namespace config

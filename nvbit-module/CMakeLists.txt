@@ -18,16 +18,17 @@ endif()
 include_directories("${NVBIT_PATH}/core")
 link_directories("${NVBIT_PATH}/core")
 
-include_directories("${CMAKE_SOURCE_DIR}/src")
+set(SRC "${CMAKE_SOURCE_DIR}/src")
 
-file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
-list(REMOVE_ITEM SOURCES "${CMAKE_SOURCE_DIR}/src/main.cpp")
+include_directories("${SRC}")
 
-file(GLOB_RECURSE INJECTEE_SOURCES "${CMAKE_SOURCE_DIR}/src/device_functions/*.injectee.cu")
-file(GLOB_RECURSE CUDA_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cu")
+file(GLOB_RECURSE SOURCES "${SRC}/*.cpp")
+list(REMOVE_ITEM SOURCES "${SRC}/main.cpp")
+
+file(GLOB_RECURSE INJECTEE_SOURCES "${SRC}/device_functions/*.injectee.cu")
+file(GLOB_RECURSE CUDA_SOURCES "${SRC}/*.cu")
 list(REMOVE_ITEM CUDA_SOURCES ${INJECTEE_SOURCES})
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --gpu-architecture=sm_52 -D_FORCE_INLINES --compiler-options=-Wall,-fPIC")
 
 add_library(entrypoint OBJECT ${CUDA_SOURCES})
@@ -38,12 +39,12 @@ target_link_libraries(entrypoint PRIVATE spdlog::spdlog)
 add_library(injected_functions OBJECT ${INJECTEE_SOURCES})
 target_compile_options(injected_functions PRIVATE --maxrregcount=24 --keep-device-functions --ptxas-options=--compile-as-tools-patch)
 
-add_library(nvbit-module-static OBJECT ${SOURCES})
-target_link_libraries(nvbit-module-static PUBLIC spdlog::spdlog ${Boost_LIBRARIES} nvbit cuda)
-
-add_library(nvbit-module SHARED "${CMAKE_SOURCE_DIR}/src/main.cpp")
+add_library(nvbit-module SHARED ${SOURCES} "${SRC}/main.cpp")
 set_target_properties(nvbit-module PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-target_link_libraries(nvbit-module PRIVATE nvbit-module-static entrypoint)
+target_link_libraries(nvbit-module PRIVATE
+                      spdlog::spdlog ${Boost_LIBRARIES} nvbit cuda
+                      entrypoint injected_functions)
+
 
 
 # Unit tests configuration
@@ -51,7 +52,9 @@ include(GoogleTest)
 include(CTest)
 file(GLOB_RECURSE TEST_SOURCES "${CMAKE_SOURCE_DIR}/test/*.cpp" "${CMAKE_SOURCE_DIR}/test/*.cu")
 
-add_executable(nvbit-module-test ${TEST_SOURCES})
-target_link_libraries(nvbit-module-test PRIVATE nvbit-module-static GTest::GTest GTest::Main)
+add_executable(nvbit-module-test ${TEST_SOURCES} ${SOURCES})
+target_link_libraries(nvbit-module-test PRIVATE
+                      GTest::GTest GTest::Main                      
+                      spdlog::spdlog ${Boost_LIBRARIES})
 
 gtest_discover_tests(nvbit-module-test)

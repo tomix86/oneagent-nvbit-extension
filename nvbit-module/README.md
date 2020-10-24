@@ -68,6 +68,7 @@ The list of settings is as denoted in the table below.
 | `runtime_config_polling_interval` | Positive integer      | 10            | Runtime configuration polling internal in seconds |
 | `measurements_output_dir`         | Valid filesystem path | _unset_       | Directory where measurements will be written to   |
 | `verbose`                         | Boolean               | false         | Enable verbose (debug) logging                    |
+| `console_log_enabled`             | Boolean               | false         | Enable logging to stdout                          |
 | `count_warp_level`                | Boolean               | true          | Count warp level or thread level instructions     |
 | `exclude_pred_off`                | Boolean               | false         | Exclude predicated off instruction from count     |
 | `mangled_names`                   | Boolean               | true          | Print kernel names mangled or not                 |

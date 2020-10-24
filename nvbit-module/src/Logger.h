@@ -6,7 +6,7 @@
 namespace logging {
 void default_initialize();
 
-void initialize(const std::filesystem::path& logFilePath);
+void initialize(const std::filesystem::path& logFilePath, bool enableConsoleLog);
 
 template <typename... Ts>
 void error(Ts... args) {
