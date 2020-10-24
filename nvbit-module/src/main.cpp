@@ -8,13 +8,11 @@
 template <typename... Ts>
 void writeStderr(Ts... parts) {
     const auto printer{[](std::string_view message){
-        if(write(STDERR_FILENO, message.data(), message.size()) == -1)
-            ;
+        (void)!write(STDERR_FILENO, message.data(), message.size());
     }};
 
     (printer(parts), ...);
-    if(write(STDERR_FILENO, "\n", 1) == -1)
-        ;
+    (void)!write(STDERR_FILENO, "\n", 1);
 }
 
 void __attribute__((constructor)) initialize() try {

@@ -10,7 +10,7 @@
 
 namespace device::occupancy {
 
-void instrumentKernel(CUcontext context, int is_exit, nvbit_api_cuda_t eventId, cuLaunch_params* params, communication::MeasurementsPublisher& measurementsPublisher) {
+void instrumentKernel(CUcontext context, int is_exit, nvbit_api_cuda_t /*eventId*/, cuLaunch_params* params, communication::MeasurementsPublisher& measurementsPublisher) {
     if (is_exit) {
         return;
     }
