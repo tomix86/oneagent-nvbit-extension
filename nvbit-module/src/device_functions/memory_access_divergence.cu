@@ -48,7 +48,7 @@ void instrumentKernel(
 	}
 
 	const auto kernelName{nvbit_get_func_name(context, function, config::get().mangled ? 1 : 0)};
-    logging::info("Instrumenting kernel {} with {} function", kernelName, STRINGIZE(IMPL_DETAIL_MEM_ACCESS_DIVERGENCE_KERNEL));
+	logging::info("Instrumenting kernel {} with {} function", kernelName, STRINGIZE(IMPL_DETAIL_MEM_ACCESS_DIVERGENCE_KERNEL));
 
 	for (auto instruction : nvbit_get_instrs(context, function)) {
 		if (instruction->getMemorySpace() != InstrType::MemorySpace::GLOBAL)

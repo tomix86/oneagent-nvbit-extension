@@ -2,25 +2,25 @@
 
 #include "RuntimeConfiguration.h"
 
-#include <thread>
 #include <atomic>
 #include <chrono>
 #include <filesystem>
+#include <thread>
 
 namespace communication {
 
 class RuntimeConfigurationPoller {
 public:
-    void initialize(std::filesystem::path filePath, std::chrono::seconds pollingInterval);
+	void initialize(std::filesystem::path filePath, std::chrono::seconds pollingInterval);
 
-    ~RuntimeConfigurationPoller();
+	~RuntimeConfigurationPoller();
 
-    const RuntimeConfiguration& getConfig();
+	const RuntimeConfiguration& getConfig();
 
 private:
-    std::thread pollerThread;
-    RuntimeConfiguration config;
-    std::atomic_bool active{false};
+	std::thread pollerThread;
+	RuntimeConfiguration config;
+	std::atomic_bool active{false};
 };
 
 } // namespace communication
