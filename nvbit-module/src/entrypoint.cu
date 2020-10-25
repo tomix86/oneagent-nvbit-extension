@@ -2,6 +2,7 @@
 #include "Logger.h"
 #include "device_functions/count_instrs.h"
 #include "device_functions/occupancy.h"
+#include "device_functions/memory_access_divergence.h"
 #include "communication/RuntimeConfigurationPoller.h"
 #include "communication/MeasurementsPublisher.h"
 
@@ -20,6 +21,9 @@ static void instrumentKernelLaunch(CUcontext context, int is_exit, nvbit_api_cud
                 break;
             case communication::InstrumentationId::occupancy:
                 device::occupancy::instrumentKernel(context, is_exit, eventId, params, measurementsPublisher);
+                break;
+            case communication::InstrumentationId::memory_access_divergence:
+                device::memory_access_divergence::instrumentKernel(context, is_exit, eventId, params, measurementsPublisher);
                 break;
             default:
                 break;

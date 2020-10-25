@@ -30,7 +30,7 @@ file(GLOB_RECURSE CUDA_SOURCES "${SRC}/*.cu")
 list(REMOVE_ITEM CUDA_SOURCES ${INJECTEE_SOURCES})
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -D_FORCE_INLINES --compiler-options=-Wall,-fPIC,-Wextra,-Werror")
-set(CMAKE_CUDA_ARCHITECTURES 52)
+set(CMAKE_CUDA_ARCHITECTURES 52 70)
 set(PEDANTIC_ERRORS -Wall -Wextra -pedantic -Werror)
 
 add_library(entrypoint OBJECT ${CUDA_SOURCES})
