@@ -1,6 +1,6 @@
 // Implementation based on Listing 8 from the paper: "Oreste Villa, Mark Stephenson, David Nellans, and Stephen W. Keckler. 2019. NVBit: A
 // Dynamic Binary Instrumentation Framework for NVIDIA GPUs. In Proceedings of the 52nd Annual IEEE/ACM International Symposium on
-// Microarchitecture< (MICRO '52). Association for Computing Machinery, New York, NY, USA, 372–383.
+// Microarchitecture (MICRO '52). Association for Computing Machinery, New York, NY, USA, 372–383.
 // DOI:https://doi.org/10.1145/3352460.3358307"
 
 #include "device_utility_functions.h"

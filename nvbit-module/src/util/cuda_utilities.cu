@@ -31,4 +31,8 @@ void checkError(CUresult result, const char* calledFunc, std::string file, int l
 			errorString ? errorString : "failed to retrieve error string");
 }
 
+bool InstrumentationCache::isInstrumented(const CUfunction& function) {
+	return !already_instrumented.insert(function).second;
+}
+
 } // namespace util

@@ -21,7 +21,7 @@ void instrumentKernel(
 
 	const auto kernelName = nvbit_get_func_name(context, params->f, config::get().mangled ? 1 : 0);
 
-	logging::info("Instrumenting kernel {} with occupancy calculation", kernelName);
+	logging::info("Instrumenting kernel \"{}\" with occupancy calculation", kernelName);
 
 	int device{};
 	checkCudaErrors(cudaGetDevice(&device));
@@ -38,7 +38,7 @@ void instrumentKernel(
 	checkCudaErrors(cuOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocks, params->f, num_ctas, kernelLaunchParams->sharedMemBytes));
 	const auto occupancy{100 * numBlocks / maxBlocks};
 
-	logging::info("kernel {} occupancy: {}% ({} / {})", kernelName, occupancy, numBlocks, maxBlocks);
+	logging::info("kernel \"{}\" occupancy: {}% ({} / {})", kernelName, occupancy, numBlocks, maxBlocks);
 	measurementsPublisher.publish(communication::InstrumentationId::occupancy, std::to_string(occupancy));
 }
 

@@ -10,11 +10,6 @@ class MeasurementsPublisher;
 
 namespace device::memory_access_divergence {
 
-void instrumentKernel(
-		CUcontext context,
-		int is_exit,
-		nvbit_api_cuda_t eventId,
-		cuLaunch_params* params,
-		communication::MeasurementsPublisher& measurementsPublisher);
+void instrumentKernel(CUcontext context, int is_exit, cuLaunch_params* params, communication::MeasurementsPublisher& measurementsPublisher);
 
 }

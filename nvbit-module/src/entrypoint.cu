@@ -27,7 +27,7 @@ static void instrumentKernelLaunch(
 			device::occupancy::instrumentKernel(context, is_exit, eventId, params, measurementsPublisher);
 			break;
 		case communication::InstrumentationId::memory_access_divergence:
-			device::memory_access_divergence::instrumentKernel(context, is_exit, eventId, params, measurementsPublisher);
+			device::memory_access_divergence::instrumentKernel(context, is_exit, params, measurementsPublisher);
 			break;
 		default:
 			break;
