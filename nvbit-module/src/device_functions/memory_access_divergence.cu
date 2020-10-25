@@ -12,7 +12,6 @@
 #include "util/preprocessor.h"
 
 #include <boost/range/adaptor/filtered.hpp>
-#include <nvbit.h>
 #include <vector>
 
 using boost::adaptors::filtered;

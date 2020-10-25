@@ -2,6 +2,7 @@
 #include "Logger.h"
 #include "communication/MeasurementsPublisher.h"
 #include "communication/RuntimeConfigurationPoller.h"
+#include "device_functions/branch_divergence.h"
 #include "device_functions/count_instrs.h"
 #include "device_functions/memory_access_divergence.h"
 #include "device_functions/occupancy.h"
@@ -28,6 +29,9 @@ static void instrumentKernelLaunch(
 			break;
 		case communication::InstrumentationId::memory_access_divergence:
 			device::memory_access_divergence::instrumentKernel(context, is_exit, params, measurementsPublisher);
+			break;
+		case communication::InstrumentationId::branch_divergence:
+			device::branch_divergence::instrumentKernel(context, is_exit, params, measurementsPublisher);
 			break;
 		default:
 			break;

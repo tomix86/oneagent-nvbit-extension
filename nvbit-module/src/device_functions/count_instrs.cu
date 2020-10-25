@@ -10,7 +10,6 @@
 
 #include <cstdint>
 #include <mutex>
-#include <nvbit.h>
 
 namespace device::count_instr {
 

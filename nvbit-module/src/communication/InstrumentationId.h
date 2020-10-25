@@ -5,7 +5,7 @@
 
 namespace communication {
 
-enum class InstrumentationId { instructions_count, occupancy, memory_access_divergence };
+enum class InstrumentationId { instructions_count, occupancy, memory_access_divergence, branch_divergence };
 
 std::string to_string(InstrumentationId id);
 
