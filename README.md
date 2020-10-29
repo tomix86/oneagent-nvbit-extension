@@ -23,13 +23,14 @@ There is no support for sending separate timeseries per device.
 ### Requirements
 
 * OneAgent version >= 1.191.
-* For plugin development: [OneAgent Plugin SDK v1.191 or newer](https://dynatrace.github.io/plugin-sdk/index.html).
-* Python >= 3.6.
-* [Compiled native module](nvbit-module/README.md).
+* [See Python part README](extension/README.md#requirements).
+* [Compiled native module](nvbit-module/README.md#building).
 
-## Configuration
+## Setup and configuration
 
-See [extension README](extension/README.md#configuration).
+For a list of available configuration options, see [extension README](extension/README.md#configuration).
+
+All processes for which the metrics should be gathered need to be [instrumented manually](nvbit-module/README.md#overview) with native module.
 
 ## Reported metrics
 
@@ -45,8 +46,6 @@ If there are multiple GPUs present, the metrics will be displayed in a joint fas
 * `instructions_per_second` will be a sum of instructions executed on all devices,
 * `gpu_occupancy` will be an average from per-device usage metrics.
 
-...
-
 ![Host metrics display](docs/images/host_screen_keymetrics.png)
 \
 _Fig 1. Host metrics reported by the extension_
@@ -55,6 +54,12 @@ _Fig 1. Host metrics reported by the extension_
 \
 _Fig 2. PGI metrics reported by the extension_
 
+## Planned metrics (future enhancements)
+
+* Global memory access efficiency (coalescence factor)
+* Branch divergence
+* GPU time (the time it took for the computations on GPU to complete)
+
 ## Alerting
 
-**TODO**: no alerts defined yet
+There are no built-in alerts defined yet.

@@ -2,14 +2,16 @@
 
 ## Overview
 
-Note that the extension can attach metrics to multiple processes at once, but the metrics will only be displayed for processes that were specified in `processTypeNames` in `plugin.json`
+Python part of the extension, written using OneAgent Extensions SDK.
+
+Note that the extension can send metrics for multiple processes at once, but the metrics will only be displayed for processes that were specified in `processTypeNames` in `plugin.json`.
 If the process type is not specified there, then metrics will still be sent, but won't appear on the WebUI.
 Currently there is no way to specify `Any` in `processTypeNames`, hence all the process types of interest need to be explicitly enumerated.
 
 ### Requirements
 
-* For plugin development: [OneAgent Plugin SDK v1.191 or newer](https://dynatrace.github.io/plugin-sdk/index.html).
-* Python >= 3.6.
+* For development: [OneAgent Extensions SDK v1.191 or newer](https://www.dynatrace.com/support/help/shortlink/extensions-hub#oneagent-extensions).
+* Python >= 3.6.6.
 
 ## Configuration
 
