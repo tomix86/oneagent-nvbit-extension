@@ -8,7 +8,7 @@ from ruxit.api.exceptions import ConfigException
 
 from communication.module_configuration_writer import ModuleConfigurationWriter, ModuleConfiguration
 from communication.measurements_reader import MeasurementsReader, Measurements
-from communication.metric_to_id_mapping import InstrumentationFunction
+from communication.instrumentation_id import InstrumentationId
 
 """
 For documentation see README.md
@@ -64,7 +64,7 @@ class NVBitExtension(BasePlugin):
         metrics = {}
         for pid, raw_metrics in measurements.items():
             groupped_metrics = [(id, [v for _,v in value]) for (id, value) in groupby(sorted(raw_metrics), lambda x:x[0])]
-            metrics[pid] = { InstrumentationFunction.get_metric_name(id):InstrumentationFunction.aggregate_samples(id, values) for id,values in groupped_metrics }
+            metrics[pid] = { InstrumentationId.get_metric_name(id):InstrumentationId.aggregate_samples(id, values) for id,values in groupped_metrics }
 
         return metrics
                 

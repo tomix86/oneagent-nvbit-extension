@@ -1,7 +1,7 @@
 from enum import IntEnum
 from typing import List
 
-class InstrumentationFunction(IntEnum):
+class InstrumentationId(IntEnum):
     INSTRUCTIONS_COUNT = 0
     OCCUPANCY = 1
 

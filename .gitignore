@@ -4,8 +4,7 @@
 *.ptx
 *.cubin
 *.fatbin
-docs/nvbit_release*
-docs/*.tar.bz2
+third-party/
 
 __pycache__
 _buildroot/

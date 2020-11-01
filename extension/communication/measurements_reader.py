@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 from os import listdir, unlink, mkdir, umask
 
-from .metric_to_id_mapping import InstrumentationFunction
+from .instrumentation_id import InstrumentationId
 
 Metric = Tuple[int, float]
 Measurements = Dict[int, List[Metric]]
