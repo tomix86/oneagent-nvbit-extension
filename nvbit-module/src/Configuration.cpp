@@ -11,6 +11,11 @@
 #include <optional>
 
 namespace po = boost::program_options;
+namespace fs = std::filesystem;
+
+using namespace std::chrono_literals;
+
+using std::chrono::seconds;
 
 template <typename Rep, typename Period>
 std::istream& operator>>(std::istream& str, std::chrono::duration<Rep, Period>& value) {
@@ -50,21 +55,29 @@ static std::optional<std::string> getEnvVar(std::string name) {
 	return std::nullopt;
 }
 
+static void validate(const Configuration& config) {
+	if (!fs::exists(config.measurements_output_dir)) {
+		throw std::runtime_error{"Measurements output directory " + config.measurements_output_dir.string() + " does not exist"};
+	}
+
+	if (config.runtime_config_polling_interval < 1s) {
+		throw std::runtime_error{"Runtime config polling interval must be >= 1"};
+	}
+}
+
 static void parseConfigFile(Configuration& config, std::ifstream& file) {
 	po::options_description options{"Settings"};
-	options.add_options()("logfile", po::value<std::filesystem::path>(&config.logFile), "Log file")(
+	options.add_options()("logfile", po::value<fs::path>(&config.logFile), "Log file")(
 			"verbose", po::value<bool>(&config.verbose), "Enable verbosity inside the tool")(
 			"console_log_enabled", po::value<bool>(&config.console_log_enabled), "Write logs to stdout")(
 			"count_warp_level", po::value<bool>(&config.count_warp_level), "Count warp level or thread level instructions")(
 			"exclude_pred_off", po::value<bool>(&config.exclude_pred_off), "Exclude predicated off instruction from count")(
 			"mangled_names", po::value<bool>(&config.mangled), "Print kernel names mangled or not")(
-			"runtime_config_path", po::value<std::filesystem::path>(&config.runtime_config_path), "Path to runtime configuration file")(
+			"runtime_config_path", po::value<fs::path>(&config.runtime_config_path), "Path to runtime configuration file")(
 			"runtime_config_polling_interval",
-			po::value<std::chrono::seconds>(&config.runtime_config_polling_interval),
+			po::value<seconds>(&config.runtime_config_polling_interval),
 			"Runtime configuration file polling interval")(
-			"measurements_output_dir",
-			po::value<std::filesystem::path>(&config.measurements_output_dir),
-			"Path to results output directory");
+			"measurements_output_dir", po::value<fs::path>(&config.measurements_output_dir), "Path to results output directory");
 
 	po::variables_map vm;
 	po::store(parse_config_file(file, options), vm);
@@ -77,7 +90,7 @@ static Configuration load() {
 		config.confFile = *val;
 	}
 
-	if (!std::filesystem::exists(config.confFile)) {
+	if (!fs::exists(config.confFile)) {
 		throw std::runtime_error{"Configuration file \"" + config.confFile.string() + "\" does not exist"};
 	}
 
@@ -87,6 +100,7 @@ static Configuration load() {
 	}
 
 	parseConfigFile(config, file);
+	validate(config);
 	return config;
 }
 

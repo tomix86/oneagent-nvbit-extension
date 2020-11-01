@@ -18,11 +18,6 @@ using std::chrono::system_clock;
 namespace communication {
 
 void MeasurementsPublisher::initialize(std::filesystem::path outputDir) {
-	if (!std::filesystem::exists(outputDir)) {
-		logging::error("Measurements output directory {} does not exist", outputDir.string());
-		return;
-	}
-
 	this->outputDir = std::move(outputDir);
 
 	logging::info("Measurements will be published to {}", this->outputDir.string());
