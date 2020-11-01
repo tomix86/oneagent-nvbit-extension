@@ -77,7 +77,7 @@ See [nvbit-module.conf](res/nvbit-module.conf) for an example.
 
 ### Runtime configuration
 
-Runtime configuration is created on the fly by Python extension and contains a list of pids that should be instrumented, along with instrumentation primitives to apply to each of them.
+Runtime configuration is created on the fly by Python extension and contains a list of pids that should be instrumented, along with instrumentation functions to apply to each of them.
 
 See [nvbit-module-runtime.conf](res/nvbit-module-runtime.conf) for an example.
-For a detailed documentation of communication protocol, [see here](../docs/communication_endpoint.md).
+For a detailed documentation of communication protocol, [see here](../docs/communication_endpoints.md).
