@@ -7,7 +7,7 @@ from util.atomic_file import atomic_write
 
 class ModuleConfiguration(NamedTuple):
     pids_to_instrument: List[int]
-    instrumentation_functions: List[InstrumentationId] = [ InstrumentationId.INSTRUCTIONS_COUNT, InstrumentationId.OCCUPANCY ]
+    instrumentation_functions: List[InstrumentationId] = [ InstrumentationId.INSTRUCTIONS_COUNT, InstrumentationId.OCCUPANCY, InstrumentationId.GMEM_ACCESS_COALESCENCE ]
 
 class ModuleConfigurationWriter:
     __confFilePath: Path = "/var/lib/dynatrace/oneagent/agent/runtime/nvbit-module-runtime.conf"

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.48",
+  "version": "1.0.51",
   "name": "custom.python.nvbit_extension",
   "type": "python",
   "requiredAgentVersion": "1.191",
@@ -38,6 +38,14 @@
         "unit": "PerSecond",
         "aggregation": "count",
         "displayname": "GPU instructions executed per second"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "gmem_access_coalescence",
+        "unit": "Percent",
+        "aggregation": "count",
+        "displayname": "Average global memory accesses coalescence factor achieved by kernels"
       }
     }
   ],
@@ -86,6 +94,18 @@
             "aggregation": "avg",
             "displayname": "Instructions executed",
             "seriestype": "bar"
+          }
+        ]
+      },
+      {
+        "group": "GPU Metrics",
+        "title": "Global memory access coalescence",
+        "series": [
+          {
+            "key": "gmem_access_coalescence",
+            "aggregation": "avg",
+            "displayname": "Total",
+            "seriestype": "line"
           }
         ]
       }

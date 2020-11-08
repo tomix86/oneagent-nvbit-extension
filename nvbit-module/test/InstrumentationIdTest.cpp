@@ -7,7 +7,7 @@ namespace communication {
 TEST(Communication, InstrumentationId_to_string) {
 	EXPECT_EQ("instructions_count", to_string(InstrumentationId::instructions_count));
 	EXPECT_EQ("occupancy", to_string(InstrumentationId::occupancy));
-	EXPECT_EQ("memory_access_divergence", to_string(InstrumentationId::memory_access_divergence));
+	EXPECT_EQ("gmem_access_coalescence", to_string(InstrumentationId::gmem_access_coalescence));
 	EXPECT_EQ("branch_divergence", to_string(InstrumentationId::branch_divergence));
 	EXPECT_THROW(to_string(static_cast<InstrumentationId>(42)), std::invalid_argument);
 }

@@ -7,7 +7,7 @@
 #include "Logger.h"
 #include "communication/InstrumentationId.h"
 #include "communication/MeasurementsPublisher.h"
-#include "memory_access_divergence.h"
+#include "gmem_access_coalescence.h"
 #include "util/cuda_utilities.h"
 #include "util/preprocessor.h"
 
@@ -16,10 +16,10 @@
 
 using boost::adaptors::filtered;
 
-namespace device::memory_access_divergence {
+namespace device::gmem_access_coalescence {
 
-__managed__ float uniqueCacheLinesAccesses{0};
-__managed__ int memoryAccessesCount{0};
+__managed__ float uniqueCacheLinesAccesses{1};
+__managed__ int memoryAccessesCount{1};
 
 static auto getInstructionOperands(Instr* instruction) {
 	std::vector<const InstrType::operand_t*> operands;
@@ -47,7 +47,7 @@ static void injectInstrumentationRoutine(CUcontext context, CUfunction kernel) {
 
 		int mref_idx{0};
 		for (auto operand : getInstructionOperands(instruction) | filtered(isMRef)) {
-			nvbit_insert_call(instruction, STRINGIZE(IMPL_DETAIL_MEM_ACCESS_DIVERGENCE_KERNEL), IPOINT_BEFORE);
+			nvbit_insert_call(instruction, STRINGIZE(IMPL_DETAIL_GMEM_ACCESS_COALESCENCE_KERNEL), IPOINT_BEFORE);
 			nvbit_add_call_arg_guard_pred_val(instruction);
 			nvbit_add_call_arg_mref_addr64(instruction, mref_idx++);
 			nvbit_add_call_arg_const_val64(instruction, reinterpret_cast<uint64_t>(&uniqueCacheLinesAccesses));
@@ -70,13 +70,13 @@ void instrumentKernel(
 	}
 
 	const auto kernelName{nvbit_get_func_name(context, kernel, config::get().mangled ? 1 : 0)};
-	logging::info("Instrumenting kernel \"{}\" with {}", kernelName, STRINGIZE(IMPL_DETAIL_MEM_ACCESS_DIVERGENCE_KERNEL));
+	logging::info("Instrumenting kernel \"{}\" with {}", kernelName, STRINGIZE(IMPL_DETAIL_GMEM_ACCESS_COALESCENCE_KERNEL));
 
 	injectInstrumentationRoutine(context, kernel);
 
-	const auto result{uniqueCacheLinesAccesses / memoryAccessesCount};
+	const auto result{100 * uniqueCacheLinesAccesses / memoryAccessesCount};
 	logging::info("kernel \"{}\", average cache lines requests per memory instruction {}", kernelName, result);
-	measurementsPublisher.publish(communication::InstrumentationId::memory_access_divergence, std::to_string(result));
+	measurementsPublisher.publish(communication::InstrumentationId::gmem_access_coalescence, std::to_string(result));
 }
 
-} // namespace device::memory_access_divergence
+} // namespace device::gmem_access_coalescence

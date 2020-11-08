@@ -4,7 +4,7 @@
 #include "communication/RuntimeConfigurationPoller.h"
 #include "device_functions/branch_divergence.h"
 #include "device_functions/count_instrs.h"
-#include "device_functions/memory_access_divergence.h"
+#include "device_functions/gmem_access_coalescence.h"
 #include "device_functions/occupancy.h"
 
 #include <boost/algorithm/cxx11/any_of.hpp>
@@ -27,8 +27,8 @@ static void instrumentKernelLaunch(
 		case communication::InstrumentationId::occupancy:
 			device::occupancy::instrumentKernel(context, is_exit, eventId, params, measurementsPublisher);
 			break;
-		case communication::InstrumentationId::memory_access_divergence:
-			device::memory_access_divergence::instrumentKernel(context, is_exit, params, measurementsPublisher);
+		case communication::InstrumentationId::gmem_access_coalescence:
+			device::gmem_access_coalescence::instrumentKernel(context, is_exit, params, measurementsPublisher);
 			break;
 		case communication::InstrumentationId::branch_divergence:
 			device::branch_divergence::instrumentKernel(context, is_exit, params, measurementsPublisher);

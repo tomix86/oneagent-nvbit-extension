@@ -4,18 +4,18 @@
 // DOI:https://doi.org/10.1145/3352460.3358307"
 
 #include "device_utility_functions.h"
-#include "memory_access_divergence.h"
+#include "gmem_access_coalescence.h"
 
 #include <cstdint>
 #include <cuda_runtime.h>
 
-namespace device::memory_access_divergence {
+namespace device::gmem_access_coalescence {
 
 // __match_any_sync() is supported for CC 7.0 and higher
 // https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#warp-match-functions
 #if __CUDA_ARCH__ >= 700
 
-extern "C" __device__ __noinline__ void IMPL_DETAIL_MEM_ACCESS_DIVERGENCE_KERNEL(
+extern "C" __device__ __noinline__ void IMPL_DETAIL_GMEM_ACCESS_COALESCENCE_KERNEL(
 		int predicate, uint64_t address, uint64_t uniqueCacheLinesAccesses, uint64_t memoryAccessesCount) {
 	if (!predicate) {
 		return;
@@ -37,4 +37,4 @@ extern "C" __device__ __noinline__ void IMPL_DETAIL_MEM_ACCESS_DIVERGENCE_KERNEL
 
 #endif // __CUDA_ARCH__ >= 700
 
-} // namespace device::memory_access_divergence
+} // namespace device::gmem_access_coalescence

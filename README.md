@@ -38,13 +38,14 @@ The table below outlines metrics collected by the extension. *Figures 1* and *2*
 
 | Key                               | Metric description |
 |-----------------------------------|--------------------|
-| gpu_occupancy                     | Average [occupancy](https://docs.nvidia.com/gameworks/index.html#developertools/desktop/analysis/report/cudaexperiments/kernellevel/achievedoccupancy.htm) achieved by kernels   |
 | instructions_per_second           | Count of instuctions executed per second |
+| gpu_occupancy                     | Average [occupancy](https://docs.nvidia.com/gameworks/index.html#developertools/desktop/analysis/report/cudaexperiments/kernellevel/achievedoccupancy.htm) achieved by kernels |
+| gmem_access_coalescence           | Average [global memory accesses coalescence factor](https://developer.nvidia.com/blog/how-access-global-memory-efficiently-cuda-c-kernels/) achieve by kernels |
 
 If there are multiple GPUs present, the metrics will be displayed in a joint fashion, i.e:
 
 * `instructions_per_second` will be a sum of instructions executed on all devices,
-* `gpu_occupancy` will be an average from per-device usage metrics.
+* `gpu_occupancy` and `gmem_access_coalescence` will be an average from per-device usage metrics.
 
 ![Host metrics display](docs/images/host_screen_keymetrics.png)
 \
