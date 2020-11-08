@@ -12,6 +12,7 @@
 #include "util/preprocessor.h"
 
 #include <boost/range/adaptor/filtered.hpp>
+#include <mutex>
 #include <vector>
 
 using boost::adaptors::filtered;
@@ -58,25 +59,50 @@ static void injectInstrumentationRoutine(CUcontext context, CUfunction kernel) {
 
 void instrumentKernel(
 		CUcontext context, int is_exit, cuLaunch_params* params, communication::MeasurementsPublisher& measurementsPublisher) {
-	if (is_exit) {
-		return;
-	}
+	static std::mutex mutex;
 
 	const auto kernel{params->f};
+	const auto kernelName{nvbit_get_func_name(context, kernel, config::get().mangled ? 1 : 0)};
 
-	static util::InstrumentationCache instrumentationCache;
-	if (instrumentationCache.isInstrumented(kernel)) {
+	constexpr util::ComputeCapability minimumRequiredCC{7, 0};
+	if (const auto cc{util::getComputeCapability()}; cc < minimumRequiredCC) {
+		logging::debug(
+				"Skipping instrumentation of kernel \"{}\" with {} as minimum compute capability requirements are not met ({} vs {})",
+				kernelName,
+				STRINGIZE(IMPL_DETAIL_GMEM_ACCESS_COALESCENCE_KERNEL),
+				cc.toString(),
+				minimumRequiredCC.toString());
 		return;
 	}
 
-	const auto kernelName{nvbit_get_func_name(context, kernel, config::get().mangled ? 1 : 0)};
-	logging::info("Instrumenting kernel \"{}\" with {}", kernelName, STRINGIZE(IMPL_DETAIL_GMEM_ACCESS_COALESCENCE_KERNEL));
+	if (!is_exit) {
+		static util::InstrumentationCache instrumentationCache;
+		if (instrumentationCache.isInstrumented(kernel)) {
+			return;
+		}
 
-	injectInstrumentationRoutine(context, kernel);
+		logging::info("Instrumenting kernel \"{}\" with {}", kernelName, STRINGIZE(IMPL_DETAIL_GMEM_ACCESS_COALESCENCE_KERNEL));
 
-	const auto result{100 * uniqueCacheLinesAccesses / memoryAccessesCount};
-	logging::info("kernel \"{}\", average cache lines requests per memory instruction {}", kernelName, result);
-	measurementsPublisher.publish(communication::InstrumentationId::gmem_access_coalescence, std::to_string(result));
+		mutex.lock(); // prevent multiple kernels from runing concurrently and therefore "corrupting" the data variables
+		injectInstrumentationRoutine(context, kernel);
+		nvbit_enable_instrumented(context, kernel, true);
+		uniqueCacheLinesAccesses = 1;
+		memoryAccessesCount = 1;
+	} else {
+		checkCudaErrors(cudaDeviceSynchronize()); // wait for kernel execution to complete
+
+		const auto cacheLinesPerMemoryInstruction{uniqueCacheLinesAccesses / memoryAccessesCount};
+		const auto coalescenceFactor{100 / cacheLinesPerMemoryInstruction};
+		logging::info(
+				"kernel \"{}\", global memory access coalescence factor {}%  (cache lines accessed: {}; memory instructions: {})",
+				kernelName,
+				coalescenceFactor,
+				uniqueCacheLinesAccesses,
+				memoryAccessesCount);
+		measurementsPublisher.publish(communication::InstrumentationId::gmem_access_coalescence, std::to_string(coalescenceFactor));
+
+		mutex.unlock();
+	}
 }
 
 } // namespace device::gmem_access_coalescence

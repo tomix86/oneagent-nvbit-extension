@@ -11,10 +11,6 @@
 
 namespace device::gmem_access_coalescence {
 
-// __match_any_sync() is supported for CC 7.0 and higher
-// https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#warp-match-functions
-#if __CUDA_ARCH__ >= 700
-
 extern "C" __device__ __noinline__ void IMPL_DETAIL_GMEM_ACCESS_COALESCENCE_KERNEL(
 		int predicate, uint64_t address, uint64_t uniqueCacheLinesAccesses, uint64_t memoryAccessesCount) {
 	if (!predicate) {
@@ -22,19 +18,21 @@ extern "C" __device__ __noinline__ void IMPL_DETAIL_GMEM_ACCESS_COALESCENCE_KERN
 	}
 
 	if (util::isFirstActiveThread()) {
+		//TODO: causes "illegal memory access was encountered" error, needs to be debugged
 		atomicAdd(reinterpret_cast<int*>(memoryAccessesCount), 1);
 	}
 
+// __match_any_sync() is supported for CC 7.0 and higher
+// https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#warp-match-functions
+#if __CUDA_ARCH__ >= 700
 	constexpr auto cacheLineSize{7}; // log2(128)
 	const auto cacheLineAddress{address >> cacheLineSize};
-
 	const auto activeMask{__ballot_sync(__activemask(), 1)};
 	const auto threadsAccessingCacheLine{__popc(__match_any_sync(activeMask, cacheLineAddress))};
 	// each thread contributes proportionally to the cache line counter, see
 	// https://github.com/NVlabs/NVBit/issues/24#issuecomment-661176067
 	atomicAdd(reinterpret_cast<float*>(uniqueCacheLinesAccesses), 1.f / threadsAccessingCacheLine);
-}
-
 #endif // __CUDA_ARCH__ >= 700
+}
 
 } // namespace device::gmem_access_coalescence

@@ -1,6 +1,8 @@
 #include "Logger.h"
 #include "cuda_utilities.h"
 
+#include <fmt/core.h>
+
 namespace util {
 
 void checkError(cudaError_t result, const char* calledFunc, std::string file, int line) {
@@ -33,6 +35,18 @@ void checkError(CUresult result, const char* calledFunc, std::string file, int l
 
 bool InstrumentationCache::isInstrumented(const CUfunction& function) {
 	return !already_instrumented.insert(function).second;
+}
+
+ComputeCapability getComputeCapability() {
+	int device;
+	cudaGetDevice(&device);
+	cudaDeviceProp deviceProp;
+	cudaGetDeviceProperties(&deviceProp, device);
+	return {deviceProp.major, deviceProp.minor};
+}
+
+std::string ComputeCapability::toString() const {
+	return fmt::format("{},{}", major, minor);
 }
 
 } // namespace util

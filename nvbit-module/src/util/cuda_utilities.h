@@ -20,4 +20,36 @@ private:
 	std::unordered_set<CUfunction> already_instrumented;
 };
 
+struct ComputeCapability {
+	int major, minor;
+
+	bool operator<(const ComputeCapability& other) const noexcept {
+		return major < other.major || minor < other.minor;
+	}
+
+	bool operator==(const ComputeCapability& other) const noexcept {
+		return !(*this < other || other < *this);
+	}
+
+	bool operator!=(const ComputeCapability& other) const noexcept {
+		return !(*this == other);
+	}
+
+	bool operator>(const ComputeCapability& other) const noexcept {
+		return other < *this;
+	}
+
+	bool operator<=(const ComputeCapability& other) const noexcept {
+		return *this < other || *this == other;
+	}
+
+	bool operator>=(const ComputeCapability& other) const noexcept {
+		return *this > other || *this == other;
+	}
+
+	std::string toString() const;
+};
+
+ComputeCapability getComputeCapability();
+
 } // namespace util

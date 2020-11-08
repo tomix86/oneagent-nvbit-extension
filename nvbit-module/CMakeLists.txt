@@ -56,7 +56,8 @@ include(CTest)
 file(GLOB_RECURSE TEST_SOURCES "${CMAKE_SOURCE_DIR}/test/*.cpp")
 file(GLOB_RECURSE CUDA_TEST_SOURCES "${CMAKE_SOURCE_DIR}/test/*.cu")
 
-add_library(cuda_tests OBJECT ${CUDA_TEST_SOURCES})
+# TODO: Properly compile cuda sources from list (must be non-nvbit)
+add_library(cuda_tests OBJECT ${CUDA_TEST_SOURCES} "${SRC}/util/cuda_utilities.cu")
 target_compile_options(cuda_tests PRIVATE -O3)
 target_link_libraries(cuda_tests PRIVATE GTest::GTest GTest::Main ${Boost_LIBRARIES} cuda)                
 

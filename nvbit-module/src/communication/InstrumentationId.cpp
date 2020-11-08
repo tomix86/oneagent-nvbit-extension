@@ -14,7 +14,7 @@ std::string to_string(InstrumentationId id) {
 		return "occupancy";
 	case InstrumentationId::gmem_access_coalescence:
 		return "gmem_access_coalescence";
-		case InstrumentationId::branch_divergence:
+	case InstrumentationId::branch_divergence:
 		return "branch_divergence";
 	default:
 		throw std::invalid_argument{"Invalid instrumentation function name"};
