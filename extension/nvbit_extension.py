@@ -6,7 +6,7 @@ from ruxit.api.data import PluginMeasurement
 from ruxit.api.selectors import ExplicitPgiSelector
 from ruxit.api.exceptions import ConfigException
 
-from communication.module_configuration_writer import ModuleConfigurationWriter, ModuleConfiguration
+from communication.module_configuration_writer import get_intrumentation_ids, ModuleConfigurationWriter, ModuleConfiguration
 from communication.measurements_reader import MeasurementsReader, Measurements
 from communication.instrumentation_id import InstrumentationId
 
@@ -17,7 +17,6 @@ For documentation see README.md
 class NVBitExtension(BasePlugin):
     devices_count: int = 0
     enable_debug_log: bool = False
-    instrumentation_enabled: bool = True
 
     def log_debug(self, message: str) -> None:
         if self.enable_debug_log:
@@ -68,7 +67,6 @@ class NVBitExtension(BasePlugin):
 
         return metrics
                 
-
     def initialize(self, **kwargs) -> None:
         self.logger.info(f"NVBit plugin initialized")
         MeasurementsReader.createMeasurementsDir()
@@ -80,7 +78,7 @@ class NVBitExtension(BasePlugin):
     def query(self, **kwargs) -> None:
         config = kwargs["config"]
         self.enable_debug_log = config["enable_debug_log"]
-        self.instrumentation_enabled = config["enable_intrumentation"]
+        instrumentation_enabled = config["instrumentation_enabled"]
 
         monitored_pg_names = config["monitored_pg_names"].split(",")
         monitored_pgis = self.get_monitored_pgis_list(monitored_pg_names)
@@ -89,9 +87,9 @@ class NVBitExtension(BasePlugin):
         for pgi in monitored_pgis.values():
             all_monitored_processes += pgi.processes
 
-        moduleConfiguration = ModuleConfiguration(pids_to_instrument = [process.pid for process in all_monitored_processes])
-        self.log_debug(f"Instrumentation enabled {self.instrumentation_enabled }, configuration: {moduleConfiguration}")
-        ModuleConfigurationWriter(self.instrumentation_enabled).write(moduleConfiguration)
+        moduleConfiguration = ModuleConfiguration(pids_to_instrument = [process.pid for process in all_monitored_processes], instrumentation_functions = get_intrumentation_ids(config))
+        self.log_debug(f"Instrumentation enabled {instrumentation_enabled}, native module configuration: {moduleConfiguration}")
+        ModuleConfigurationWriter(instrumentation_enabled).write(moduleConfiguration)
 
         measurements = MeasurementsReader.read()
         self.log_debug(f"Measurements: {measurements}")

@@ -1,8 +1,8 @@
 {
-  "version": "1.0.51",
+  "version": "1.0.56",
   "name": "custom.python.nvbit_extension",
   "type": "python",
-  "requiredAgentVersion": "1.191",
+  "requiredAgentVersion": "1.203",
   "entity": "PROCESS_GROUP_INSTANCE",
   "metricGroup": "gpu.cuda",
   "processTypeNames": [
@@ -120,15 +120,25 @@
         "displayOrder": 1
       },
       {
-        "key": "enable_intrumentation",
-        "displayName": "Enable instrumentation",
-        "displayOrder": 2
-      },
-      {
         "key": "monitored_pg_names",
         "displayName": "Names of process groups that should be monitored",
-        "displayOrder": 3,
+        "displayOrder": 2,
         "displayHint": "CUDA app,blockchain_processor[,...]"
+      },
+      {
+        "key": "instrumentation_enabled",
+        "displayName": "Enable instrumentation",
+        "displayOrder": 3
+      },
+      {
+        "key": "instrumentation_code_injection",
+        "displayName": "Code injection measurements",
+        "displayOrder": 4
+      },
+      {
+        "key": "instrumentation_occupancy",
+        "displayName": "Measure occupancy",
+        "displayOrder": 5
       }
     ]
   },
@@ -139,14 +149,25 @@
       "defaultValue": false
     },
     {
-      "key": "enable_intrumentation",
+      "key": "monitored_pg_names",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "instrumentation_enabled",
       "type": "boolean",
       "defaultValue": true
     },
     {
-      "key": "monitored_pg_names",
-      "type": "string",
-      "defaultValue": ""
+      "key": "instrumentation_occupancy",
+      "type": "boolean",
+      "defaultValue": true
+    },
+    {
+      "key": "instrumentation_code_injection",
+      "type": "dropdown",
+      "defaultValue": "gmem_access_coalescence",
+      "dropdownValues": [ "none", "instructions_per_second", "gmem_access_coalescence" ]
     }
   ]
 }

@@ -16,5 +16,7 @@ Currently there is no way to specify `Any` in `processTypeNames`, hence all the 
 ## Configuration
 
 * `enable_debug_log` - enables debug logging for troubleshooting purposes.
-* `enable_intrumentation` - enables instrumentation
-* `monitored_pg_names` - Comma-delimited list of process groups names that should be monitored
+* `monitored_pg_names` - comma-delimited list of process groups names that should be monitored.
+* `instrumentation_enabled` - enables instrumentation.
+* `instrumentation_occupancy` - enables occupancy measurement.
+* `instrumentation_code_injection` - (dropdown) enables selected code injection measurement.

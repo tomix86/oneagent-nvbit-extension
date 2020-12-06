@@ -15,7 +15,18 @@ class InstrumentationId(IntEnum):
         elif (id == cls.GMEM_ACCESS_COALESCENCE):
             return "gmem_access_coalescence"
         else:
-            raise ValueError("Unknown metric identifier")
+            raise ValueError(f"Unknown metric identifier: {id}")
+
+    @classmethod
+    def get_metric_id(cls, name: str) -> str:
+        if(name == "instructions_per_second"):
+            return cls.INSTRUCTIONS_COUNT
+        elif (name == "gpu_occupancy"):
+            return cls.OCCUPANCY
+        elif (name == "gmem_access_coalescence"):
+            return cls.GMEM_ACCESS_COALESCENCE
+        else:
+            raise ValueError(f"Unknown metric name: {name}")
 
     @classmethod
     def aggregate_samples(cls, id: int, samples: List[float]) -> float:

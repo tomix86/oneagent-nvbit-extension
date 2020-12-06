@@ -1,13 +1,23 @@
 from pathlib import Path
-from typing import NamedTuple, List
+from typing import NamedTuple, List, Dict, Any
 from os import fsync, rename
 
 from .instrumentation_id import InstrumentationId
 from util.atomic_file import atomic_write
 
+def get_intrumentation_ids(config: Dict[str, Any]) -> List[InstrumentationId]:
+    intrumentation_ids = []
+    if config["instrumentation_occupancy"]:
+        intrumentation_ids.append(InstrumentationId.OCCUPANCY)
+
+    if config["instrumentation_code_injection"] != "none":
+        intrumentation_ids.append(InstrumentationId.get_metric_id(config["instrumentation_code_injection"]))
+    
+    return intrumentation_ids
+
 class ModuleConfiguration(NamedTuple):
     pids_to_instrument: List[int]
-    instrumentation_functions: List[InstrumentationId] = [ InstrumentationId.INSTRUCTIONS_COUNT, InstrumentationId.OCCUPANCY, InstrumentationId.GMEM_ACCESS_COALESCENCE ]
+    instrumentation_functions: List[InstrumentationId]
 
 class ModuleConfigurationWriter:
     __confFilePath: Path = "/var/lib/dynatrace/oneagent/agent/runtime/nvbit-module-runtime.conf"

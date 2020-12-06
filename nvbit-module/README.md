@@ -84,7 +84,7 @@ For a detailed documentation of communication protocol, [see here](../docs/commu
 
 ## Limitations
 
-Multiple code instrumentation routines cannot be enabled at once, e.g.
+Multiple GPU code injection routines cannot be enabled at once, e.g.
 
 * `gmem_access_coalescence` and `count_instr` combined won't work
 * `gmem_access_coalescence` and `occupancy` will work

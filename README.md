@@ -22,7 +22,7 @@ There is no support for sending separate timeseries per device.
 
 ### Requirements
 
-* OneAgent version >= 1.191.
+* OneAgent version >= 1.203.
 * [See Python part README](extension/README.md#requirements).
 * [Compiled native module](nvbit-module/README.md#building).
 
