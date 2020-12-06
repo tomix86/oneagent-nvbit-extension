@@ -12,6 +12,7 @@
 #include "util/preprocessor.h"
 
 #include <boost/range/adaptor/filtered.hpp>
+#include <cstdint>
 #include <mutex>
 #include <vector>
 
@@ -20,7 +21,7 @@ using boost::adaptors::filtered;
 namespace device::gmem_access_coalescence {
 
 __managed__ float uniqueCacheLinesAccesses{1};
-__managed__ int memoryAccessesCount{1};
+__managed__ uint64_t memoryAccessesCount{1};
 
 static auto getInstructionOperands(Instr* instruction) {
 	std::vector<const InstrType::operand_t*> operands;
@@ -67,12 +68,12 @@ void instrumentKernel(
 	constexpr util::ComputeCapability minimumRequiredCC{7, 0};
 	if (const auto cc{util::getComputeCapability()}; cc < minimumRequiredCC) {
 		logging::debug(
-				"Skipping instrumentation of kernel \"{}\" with {} as minimum compute capability requirements are not met ({} vs {})",
+				"Instrumenting kernel \"{}\" with a less optimized variant of {} as minimum compute capability requirements are not met "
+				"({} vs {})",
 				kernelName,
 				STRINGIZE(IMPL_DETAIL_GMEM_ACCESS_COALESCENCE_KERNEL),
 				cc.toString(),
 				minimumRequiredCC.toString());
-		return;
 	}
 
 	if (!is_exit) {

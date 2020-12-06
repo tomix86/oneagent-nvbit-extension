@@ -81,3 +81,12 @@ Runtime configuration is created on the fly by Python extension and contains a l
 
 See [nvbit-module-runtime.conf](res/nvbit-module-runtime.conf) for an example.
 For a detailed documentation of communication protocol, [see here](../docs/communication_endpoints.md).
+
+## Limitations
+
+Multiple code instrumentation routines cannot be enabled at once, e.g.
+
+* `gmem_access_coalescence` and `count_instr` combined won't work
+* `gmem_access_coalescence` and `occupancy` will work
+
+This limitation is subject to removal in future increments.
