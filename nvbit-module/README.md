@@ -17,7 +17,7 @@ ONEAGENT_NVBIT_EXTENSION_CONF_FILE=<path-to>/nvbit-module.conf LD_PRELOAD=<path-
 |------------------------------------------------------------|----------------|
 |[spdlog](https://github.com/gabime/spdlog)                  | 1.3.1          |
 |[CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) | 11.0           |
-|[NVBit](https://github.com/NVlabs/NVBit)                    | 1.5            |
+|[NVBit](https://github.com/NVlabs/NVBit)                    | 1.5.2          |
 |[Boost](https://www.boost.org/)                             | 1.71.0         |
 |[Google Test](https://github.com/google/googletest)         | 1.10.0         |
 |[CMake](https://cmake.org/download/)                        | 3.18.4         |
