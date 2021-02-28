@@ -14,7 +14,7 @@ public:
 	std::vector<InstrumentationId> getInstrumentationFunctions() const;
 
 private:
-	std::vector<int> instrumentationFunctions;
+	std::vector<InstrumentationId> instrumentationFunctions;
 };
 
 } // namespace communication

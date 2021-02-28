@@ -3,6 +3,7 @@
 #include "util/ErrorUtil.h"
 
 #include <boost/algorithm/string.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 #include <fstream>
 #include <stdexcept>
 #include <sys/types.h>
@@ -40,24 +41,25 @@ void RuntimeConfiguration::load(const std::filesystem::path& filePath) {
 		try {
 			std::vector<std::string> functionIds;
 			boost::split(functionIds, tokens.back(), boost::is_any_of(","));
-			for (const auto& id : functionIds) {
-				instrumentationFunctions.push_back(std::stoi(id));
+			for (const auto& id : functionIds | boost::adaptors::transformed([](auto i) { return std::stoi(i); })) {
+				if (!isInstrumentationIdValid(id)) {
+					throw std::runtime_error{"Invalid instrumentation id: " + std::to_string(id)};
+				}
+
+				instrumentationFunctions.push_back(InstrumentationId{id});
 			}
-		} catch (const std::exception&) {
-			throw std::runtime_error{"malformed key encountered: " + tokens.back()};
+
+			if (!isInstrumentationSetValid(instrumentationFunctions)) {
+				throw std::runtime_error{"Multiple injection routines cannot be combined together"};
+			}
+		} catch (const std::exception& ex) {
+			throw std::runtime_error{"malformed key encountered: " + tokens.back() + ", " + ex.what()};
 		}
 	}
 }
 
 std::vector<InstrumentationId> RuntimeConfiguration::getInstrumentationFunctions() const {
-	std::vector<InstrumentationId> result;
-	for (auto functionId : instrumentationFunctions) {
-		if (isInstrumentationIdValid(functionId)) {
-			result.push_back(InstrumentationId{functionId});
-		}
-	}
-
-	return result;
+	return instrumentationFunctions;
 }
 
 } // namespace communication
