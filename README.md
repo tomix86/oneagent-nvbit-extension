@@ -1,3 +1,5 @@
+> :warning: This project was a proof of concept prepared during the course of my doctoral studies. It was abandoned early in development phase and **is not stable**. Nevertheless, feel free to draw inspiration and build upon it. :warning:
+
 # OneAgent NVBit Extension
 
 ## Foreword
